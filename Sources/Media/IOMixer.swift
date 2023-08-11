@@ -312,7 +312,8 @@ extension IOMixer: MediaLinkDelegate {
     }
 
     func mediaLink(_ mediaLink: MediaLink, didBufferingChanged: Bool) {
-        logger.info(didBufferingChanged)
+        // to revert
+        //logger.info(didBufferingChanged)
     }
 }
 

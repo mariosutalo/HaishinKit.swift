@@ -12,18 +12,19 @@ protocol MediaLinkDelegate: AnyObject {
 final class MediaLink {
     private static let bufferTime = 0.2
     private static let bufferingTime = 0.0
-
+    
     var isPaused = false {
         didSet {
             guard isPaused != oldValue else {
                 return
             }
             choreographer.isPaused = isPaused
+            // to delete
             nstry({
                 if self.isPaused {
-                    self.playerNode.pause()
+                    //self.playerNode.pause()
                 } else {
-                    self.playerNode.play()
+                    //self.playerNode.play()
                 }
             }, { exeption in
                 logger.warn(exeption)
@@ -54,7 +55,9 @@ final class MediaLink {
     private var bufferQueue: CMBufferQueue?
     private var scheduledAudioBuffers: Atomic<Int> = .init(0)
     private var presentationTimeStampOrigin: CMTime = .invalid
-
+    //to delete - testing
+    private var counter: Int = 0
+    
     func enqueueVideo(_ buffer: CMSampleBuffer) {
         guard buffer.presentationTimeStamp != .invalid else {
             return
@@ -77,8 +80,10 @@ final class MediaLink {
             }
         }
     }
-
+    
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
+        // to delete
+        return
         nstry({
             self.scheduledAudioBuffers.mutate { $0 += 1 }
             self.playerNode.scheduleBuffer(buffer, completionHandler: self.didAVAudioNodeCompletion)
@@ -89,7 +94,7 @@ final class MediaLink {
             logger.warn(exeption)
         })
     }
-
+    
     private func duration(_ duraiton: Double) -> Double {
         if playerNode.isPlaying {
             guard let nodeTime = playerNode.lastRenderTime, let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else {
@@ -99,7 +104,7 @@ final class MediaLink {
         }
         return duraiton
     }
-
+    
     private func didAVAudioNodeCompletion() {
         scheduledAudioBuffers.mutate {
             $0 -= 1
@@ -108,11 +113,29 @@ final class MediaLink {
             }
         }
     }
-
+    
+    private func removeTimestampFromBuffer (_ sampleBuffer: CMSampleBuffer) {
+        let attachments: CFArray! = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: true)
+        let dictionary = unsafeBitCast(CFArrayGetValueAtIndex(attachments, 0), to: CFMutableDictionary.self)
+        let key = Unmanaged.passUnretained(kCMSampleAttachmentKey_DisplayImmediately).toOpaque()
+        let value = Unmanaged.passUnretained(kCFBooleanTrue).toOpaque()
+        CFDictionarySetValue(dictionary, key, value)
+    }
+    
+    /*private func makeBufferkQueue() {
+     CMBufferQueueCreate(
+     allocator: kCFAllocatorDefault,
+     capacity: 256,
+     callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
+     queueOut: &bufferQueue
+     )
+     }*/
+    
+    //to delete - testing
     private func makeBufferkQueue() {
         CMBufferQueueCreate(
             allocator: kCFAllocatorDefault,
-            capacity: 256,
+            capacity: 0,
             callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
             queueOut: &bufferQueue
         )
@@ -121,7 +144,7 @@ final class MediaLink {
 
 extension MediaLink: ChoreographerDelegate {
     // MARK: ChoreographerDelegate
-    func choreographer(_ choreographer: any Choreographer, didFrame duration: Double) {
+    func choreographerr(_ choreographer: any Choreographer, didFrame duration: Double) {
         guard let bufferQueue else {
             return
         }
@@ -145,6 +168,31 @@ extension MediaLink: ChoreographerDelegate {
         }
         isBuffering = true
     }
+    
+    func choreographer(_ choreographer: any Choreographer, didFrame duration: Double) {
+        guard let bufferQueue else {
+            return
+        }
+        guard let head = CMBufferQueueGetHead(bufferQueue) else {
+            return
+        }
+        let first = head as! CMSampleBuffer
+        //to delete - testing
+        counter+=1
+        if counter == 30 {
+            //print("Total buffer duration: \(bufferQueue.duration.seconds)")
+            //print("Single buffer duration: \(first.duration), output duration \(first.outputDuration)")
+            counter = 0
+        }
+        if bufferQueue.duration.seconds > 0.2 {
+            delegate?.mediaLink(self, dequeue: first)
+            CMBufferQueueDequeue(bufferQueue)
+            removeTimestampFromBuffer(first)
+        } else {
+            //print("inside buffer change")
+            isBuffering = true
+        }
+    }
 }
 
 extension MediaLink: Running {
@@ -162,7 +210,7 @@ extension MediaLink: Running {
             self.isRunning.mutate { $0 = true }
         }
     }
-
+    
     func stopRunning() {
         lockQueue.async {
             guard self.isRunning.value else {

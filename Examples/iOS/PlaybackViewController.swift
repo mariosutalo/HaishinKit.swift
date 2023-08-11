@@ -20,12 +20,11 @@ final class PlaybackViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        logger.info("viewWillAppear")
         super.viewWillAppear(animated)
         (view as? (any NetStreamDrawable))?.attachStream(rtmpStream)
-        if #available(iOS 15.0, *), let layer = view.layer as? AVSampleBufferDisplayLayer {
-            pictureInPictureController = AVPictureInPictureController(contentSource: .init(sampleBufferDisplayLayer: layer, playbackDelegate: self))
-        }
+        //to delete - testing
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -86,38 +85,13 @@ final class PlaybackViewController: UIViewController {
     @objc
     private func didEnterBackground(_ notification: Notification) {
         logger.info(notification)
-        if pictureInPictureController?.isPictureInPictureActive == false {
-            rtmpStream.receiveVideo = false
-        }
+        rtmpStream.receiveVideo = false
     }
 
     @objc
     private func didBecomeActive(_ notification: Notification) {
         logger.info(notification)
-        if pictureInPictureController?.isPictureInPictureActive == false {
-            rtmpStream.receiveVideo = true
-        }
-    }
-}
-
-extension PlaybackViewController: AVPictureInPictureSampleBufferPlaybackDelegate {
-    // MARK: AVPictureInPictureControllerDelegate
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, setPlaying playing: Bool) {
-    }
-
-    func pictureInPictureControllerTimeRangeForPlayback(_ pictureInPictureController: AVPictureInPictureController) -> CMTimeRange {
-        return CMTimeRange(start: .zero, duration: .positiveInfinity)
-    }
-
-    func pictureInPictureControllerIsPlaybackPaused(_ pictureInPictureController: AVPictureInPictureController) -> Bool {
-        return false
-    }
-
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, didTransitionToRenderSize newRenderSize: CMVideoDimensions) {
-    }
-
-    func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, skipByInterval skipInterval: CMTime, completion completionHandler: @escaping () -> Void) {
-        completionHandler()
+        rtmpStream.receiveVideo = true
     }
 }
 
