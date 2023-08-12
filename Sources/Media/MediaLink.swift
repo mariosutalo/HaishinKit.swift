@@ -19,12 +19,11 @@ final class MediaLink {
                 return
             }
             choreographer.isPaused = isPaused
-            // to delete
             nstry({
                 if self.isPaused {
-                    //self.playerNode.pause()
+                    self.playerNode.pause()
                 } else {
-                    //self.playerNode.play()
+                    self.playerNode.play()
                 }
             }, { exeption in
                 logger.warn(exeption)
@@ -55,8 +54,12 @@ final class MediaLink {
     private var bufferQueue: CMBufferQueue?
     private var scheduledAudioBuffers: Atomic<Int> = .init(0)
     private var presentationTimeStampOrigin: CMTime = .invalid
-    //to delete - testing
+    // added code
     private var counter: Int = 0
+    public var bufferSize: Double {
+        bufferQueue?.duration.seconds ?? 0
+    }
+    // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
         guard buffer.presentationTimeStamp != .invalid else {
@@ -82,8 +85,6 @@ final class MediaLink {
     }
     
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
-        // to delete
-        return
         nstry({
             self.scheduledAudioBuffers.mutate { $0 += 1 }
             self.playerNode.scheduleBuffer(buffer, completionHandler: self.didAVAudioNodeCompletion)
@@ -122,20 +123,10 @@ final class MediaLink {
         CFDictionarySetValue(dictionary, key, value)
     }
     
-    /*private func makeBufferkQueue() {
-     CMBufferQueueCreate(
-     allocator: kCFAllocatorDefault,
-     capacity: 256,
-     callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
-     queueOut: &bufferQueue
-     )
-     }*/
-    
-    //to delete - testing
     private func makeBufferkQueue() {
         CMBufferQueueCreate(
             allocator: kCFAllocatorDefault,
-            capacity: 0,
+            capacity: 256,
             callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
             queueOut: &bufferQueue
         )
@@ -177,19 +168,11 @@ extension MediaLink: ChoreographerDelegate {
             return
         }
         let first = head as! CMSampleBuffer
-        //to delete - testing
-        counter+=1
-        if counter == 30 {
-            //print("Total buffer duration: \(bufferQueue.duration.seconds)")
-            //print("Single buffer duration: \(first.duration), output duration \(first.outputDuration)")
-            counter = 0
-        }
         if bufferQueue.duration.seconds > 0.2 {
-            delegate?.mediaLink(self, dequeue: first)
             CMBufferQueueDequeue(bufferQueue)
+            delegate?.mediaLink(self, dequeue: first)
             removeTimestampFromBuffer(first)
         } else {
-            //print("inside buffer change")
             isBuffering = true
         }
     }
@@ -222,5 +205,11 @@ extension MediaLink: Running {
             self.presentationTimeStampOrigin = .invalid
             self.isRunning.mutate { $0 = false }
         }
+    }
+}
+
+extension MediaLink {
+    var playbackChoreographer: Choreographer {
+        return choreographer
     }
 }

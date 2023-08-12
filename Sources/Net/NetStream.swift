@@ -14,6 +14,8 @@ public protocol NetStreamDelegate: AnyObject {
     func stream(_ stream: NetStream, didOutput audio: AVAudioBuffer, presentationTimeStamp: CMTime)
     /// Tells the receiver to playback a video packet incoming.
     func stream(_ stream: NetStream, didOutput video: CMSampleBuffer)
+    // added code
+    func stream(_ stream: NetStream, videoBufferSize: Double)
     #if os(iOS)
     /// Tells the receiver to session was interrupted.
     func stream(_ stream: NetStream, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?)

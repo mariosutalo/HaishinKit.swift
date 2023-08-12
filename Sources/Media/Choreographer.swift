@@ -13,16 +13,18 @@ protocol ChoreographerDelegate: AnyObject {
 protocol Choreographer: Running {
     var isPaused: Bool { get set }
     var delegate: (any ChoreographerDelegate)? { get set }
-    
     func clear()
+    func setPlaybackSpeed(speed playbackSpeed: Double)
 }
 
 final class DisplayLinkChoreographer: NSObject, Choreographer {
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
     let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInteractive)
-    var timer: DispatchSourceTimer!
-    var poolingInterval: Double = 0.04166667
+    var dequeBufferThread: Thread!
+    var playbackTimer: DispatchSourceTimer!
+    // 24 frames per second
+    let fps: Double = 24
     var addInitialDelay: Bool = true
     var initialDequeuDelaySeconds: Double = 0.5
     
@@ -67,52 +69,77 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
 extension DisplayLinkChoreographer: Running {
     
     
+    /*func startRunning() {
+        if isRunning.value == true {
+            return
+        }
+        isRunning.mutate { $0 = true }
+        dequeBufferThread = Thread() { [weak self] in
+
+            while(self?.isRunning.value == true) {
+                guard let self = self else {
+                    return
+                }
+                if self.addInitialDelay == true {
+                    Thread.sleep(forTimeInterval: self.initialDequeuDelaySeconds)
+                    self.addInitialDelay = false
+                }
+                self.update()
+                Thread.sleep(forTimeInterval: self.poolingInterval)
+            }
+        }
+        dequeBufferThread.qualityOfService = .userInteractive
+        dequeBufferThread.start()
+     //isRunning.mutate { $0 = true }
+     //displayLink = DisplayLink(target: self, selector: #selector(self.update(displayLink:)))
+    }*/
+    
     func startRunning() {
         if isRunning.value == true {
             return
         }
         isRunning.mutate { $0 = true }
-        dequeuBufferQueue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            while(self.isRunning.value == true) {
-                if self.addInitialDelay {
-                    Thread.sleep(forTimeInterval: self.initialDequeuDelaySeconds)
-                    self.addInitialDelay = false
-                }
-                self.update()
-                /*DispatchQueue.main.async(qos: .userInteractive) {
-                    self.update()
-                }*/
-                Thread.sleep(forTimeInterval: self.poolingInterval)
-            }
-        }
-        //isRunning.mutate { $0 = true }
-        //displayLink = DisplayLink(target: self, selector: #selector(self.update(displayLink:)))
-    }
-    
-    func startRunningv1() {
-        if isRunning.value == true {
-            return
-        }
-        isRunning.mutate { $0 = true }
-        timer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        timer.schedule(deadline: .now(), repeating:poolingInterval, leeway: .nanoseconds(0))
-        timer.setEventHandler() { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.update()
-        }
-        timer.resume()
+        initializeAndStartPlaybackTimer(speed: 1.0)
     }
     
     func stopRunning() {
         //displayLink = nil
         //duration = DisplayLinkChoreographer.duration
         isRunning.mutate { $0 = false }
-        //timer.cancel()
-        addInitialDelay = true
+        guard let timer = playbackTimer else {
+            return
+        }
+        if !timer.isCancelled {
+            timer.cancel()
+        }
+        //addInitialDelay = true
+    }
+    
+    func setPlaybackSpeed(speed playbackSpeed: Double) {
+        guard let timer = playbackTimer else {
+            return
+        }
+        if !timer.isCancelled {
+            timer.cancel()
+        }
+        initializeAndStartPlaybackTimer(speed: playbackSpeed)
+    }
+}
+
+extension DisplayLinkChoreographer {
+
+    func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
+        let poolingInterval = 1 / (fps * playbackSpeed)
+        playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
+        playbackTimer.schedule(deadline: .now(), repeating: poolingInterval, leeway: .nanoseconds(0))
+        playbackTimer.setEventHandler() { [weak self] in
+            guard let self = self else {
+                return
+            }
+            DispatchQueue.main.async {
+                self.update()
+            }
+        }
+        playbackTimer.resume()
     }
 }

@@ -28,12 +28,12 @@ final class PlaybackViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        logger.info("viewWillDisappear")
         super.viewWillDisappear(animated)
     }
 
     @IBAction func didEnterPixtureInPicture(_ button: UIButton) {
-        pictureInPictureController?.startPictureInPicture()
+        print("new playback speed: 0.2")
+        rtmpStream.setPlaybackSpeed(playbackSpeed: 0.2)
     }
 
     @IBAction func didPlaybackButtonTap(_ button: UIButton) {
@@ -96,6 +96,11 @@ final class PlaybackViewController: UIViewController {
 }
 
 extension PlaybackViewController: NetStreamDelegate {
+    
+    func stream(_ stream: NetStream, videoBufferSize: Double) {
+        print("buffer size is: \(videoBufferSize)")
+    }
+    
     // MARK: NetStreamDelegate
     func stream(_ stream: NetStream, didOutput audio: AVAudioBuffer, presentationTimeStamp: CMTime) {
     }
