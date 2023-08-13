@@ -338,8 +338,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="813"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p4J-1x-O1c">
-                                <rect key="frame" x="369" y="734" width="30" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hb6-cH-XwB">
+                                <rect key="frame" x="223" y="651" width="95" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="decrease"/>
+                                <connections>
+                                    <action selector="decreasePlaybackSpeed:" destination="S4s-US-fOh" eventType="touchUpInside" id="Ttg-6d-YHF"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8AI-xv-scp">
+                                <rect key="frame" x="106" y="649" width="89" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="increase"/>
+                                <connections>
+                                    <action selector="increasePlaybackSpeed:" destination="S4s-US-fOh" eventType="touchUpInside" id="5X1-wa-nJ7"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p4J-1x-O1c">
+                                <rect key="frame" x="341" y="654" width="30" height="30"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="8DG-lB-HSj"/>
@@ -351,26 +369,11 @@
                                     <action selector="didPlaybackButtonTap:" destination="S4s-US-fOh" eventType="touchDown" id="bAJ-ml-suS"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nie-97-pLL">
-                                <rect key="frame" x="369" y="689" width="30" height="30"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="6VI-Zc-kOn"/>
-                                    <constraint firstAttribute="width" constant="30" id="aoL-jR-H2u"/>
-                                </constraints>
-                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <state key="normal" title=" PiP"/>
-                                <connections>
-                                    <action selector="didEnterPixtureInPicture:" destination="S4s-US-fOh" eventType="touchUpInside" id="df8-Oz-vv8"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="z9R-Rx-Qeu"/>
                         <color key="backgroundColor" systemColor="systemGray2Color"/>
                         <constraints>
                             <constraint firstItem="z9R-Rx-Qeu" firstAttribute="bottom" secondItem="p4J-1x-O1c" secondAttribute="bottom" constant="15" id="4Qz-Gj-1rz"/>
-                            <constraint firstItem="p4J-1x-O1c" firstAttribute="top" secondItem="Nie-97-pLL" secondAttribute="bottom" constant="15" id="Iie-qT-aen"/>
-                            <constraint firstItem="z9R-Rx-Qeu" firstAttribute="trailing" secondItem="Nie-97-pLL" secondAttribute="trailing" constant="15" id="pqr-wR-mX4"/>
                             <constraint firstItem="z9R-Rx-Qeu" firstAttribute="trailing" secondItem="p4J-1x-O1c" secondAttribute="trailing" constant="15" id="y0c-uc-INm"/>
                         </constraints>
                     </view>

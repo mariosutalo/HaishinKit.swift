@@ -170,8 +170,9 @@ extension MediaLink: ChoreographerDelegate {
         let first = head as! CMSampleBuffer
         if bufferQueue.duration.seconds > 0.2 {
             CMBufferQueueDequeue(bufferQueue)
-            delegate?.mediaLink(self, dequeue: first)
             removeTimestampFromBuffer(first)
+            delegate?.mediaLink(self, dequeue: first)
+
         } else {
             isBuffering = true
         }

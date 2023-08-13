@@ -31,11 +31,6 @@ final class PlaybackViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
 
-    @IBAction func didEnterPixtureInPicture(_ button: UIButton) {
-        print("new playback speed: 0.2")
-        rtmpStream.setPlaybackSpeed(playbackSpeed: 0.2)
-    }
-
     @IBAction func didPlaybackButtonTap(_ button: UIButton) {
         if button.isSelected {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -52,7 +47,17 @@ final class PlaybackViewController: UIViewController {
         }
         button.isSelected.toggle()
     }
-
+    
+    @IBAction func increasePlaybackSpeed(_ sender: Any) {
+        print("new playback speed: 4")
+        rtmpStream.setPlaybackSpeed(playbackSpeed: 4)
+    }
+    
+    @IBAction func decreasePlaybackSpeed(_ sender: Any) {
+        print("new playback speed: 0.2")
+        rtmpStream.setPlaybackSpeed(playbackSpeed: 0.2)
+    }
+    
     @objc
     private func rtmpStatusHandler(_ notification: Notification) {
         let e = Event.from(notification)
