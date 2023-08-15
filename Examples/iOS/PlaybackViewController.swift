@@ -12,16 +12,28 @@ final class PlaybackViewController: UIViewController {
     private var rtmpStream: RTMPStream!
     private var retryCount: Int = 0
     private var pictureInPictureController: AVPictureInPictureController?
+    let streamPlayer: HKPlayerView = HKPlayerView()
 
+    @IBOutlet weak var increaseButton: UIButton!
+    
+    @IBOutlet weak var decreaseButton: UIButton!
+    
+    @IBOutlet weak var startPlaybackButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         rtmpStream = RTMPStream(connection: rtmpConnection)
         rtmpStream.delegate = self
+        streamPlayer.frame = view.frame
+        view.addSubview(streamPlayer)
+        view.bringSubviewToFront(increaseButton)
+        view.bringSubviewToFront(decreaseButton)
+        view.bringSubviewToFront(playbackButton)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        (view as? (any NetStreamDrawable))?.attachStream(rtmpStream)
+        //(view as? (any NetStreamDrawable))?.attachStream(rtmpStream)
         //to delete - testing
         NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
@@ -29,6 +41,7 @@ final class PlaybackViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
     }
 
     @IBAction func didPlaybackButtonTap(_ button: UIButton) {
@@ -91,12 +104,14 @@ final class PlaybackViewController: UIViewController {
     private func didEnterBackground(_ notification: Notification) {
         logger.info(notification)
         rtmpStream.receiveVideo = false
+        rtmpStream.receiveAudio = false
     }
 
     @objc
     private func didBecomeActive(_ notification: Notification) {
         logger.info(notification)
         rtmpStream.receiveVideo = true
+        rtmpStream.receiveAudio = true
     }
 }
 
@@ -106,11 +121,11 @@ extension PlaybackViewController: NetStreamDelegate {
         print("buffer size is: \(videoBufferSize)")
     }
     
-    // MARK: NetStreamDelegate
     func stream(_ stream: NetStream, didOutput audio: AVAudioBuffer, presentationTimeStamp: CMTime) {
     }
 
     func stream(_ stream: NetStream, didOutput video: CMSampleBuffer) {
+        streamPlayer.enqueue(video)
     }
 
     func stream(_ stream: NetStream, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?) {

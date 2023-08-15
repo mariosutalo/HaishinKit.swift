@@ -288,6 +288,9 @@
 		2EC97B7427880FF400D8BE32 /* MTHKSwiftUiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC97B7027880FF400D8BE32 /* MTHKSwiftUiView.swift */; };
 		4C85E4292A84E61B004F0E86 /* Logboard.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; };
 		4C85E42A2A84E61B004F0E86 /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4CCA4A6F2A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
+		4CCA4A702A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
+		4CCA4A712A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
 		BC0BF4F22985FA9000D72CB4 /* HaishinKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2945CBBD1B4BE66000104112 /* HaishinKit.framework */; };
 		BC0BF4F529866FDE00D72CB4 /* IOMixerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0BF4F429866FDE00D72CB4 /* IOMixerTests.swift */; };
 		BC0BF4F72986CE8700D72CB4 /* VideoCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC0BF4F62986CE8700D72CB4 /* VideoCodecTests.swift */; };
@@ -751,6 +754,7 @@
 		2EC97B6E27880FF400D8BE32 /* OnTapGestureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnTapGestureView.swift; sourceTree = "<group>"; };
 		2EC97B6F27880FF400D8BE32 /* Views.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2EC97B7027880FF400D8BE32 /* MTHKSwiftUiView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTHKSwiftUiView.swift; sourceTree = "<group>"; };
+		4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKPlayerView.swift; sourceTree = "<group>"; };
 		BC0BF4F429866FDE00D72CB4 /* IOMixerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOMixerTests.swift; sourceTree = "<group>"; };
 		BC0BF4F62986CE8700D72CB4 /* VideoCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCodecTests.swift; sourceTree = "<group>"; };
 		BC0D236C26331BAB001DDA0C /* DataBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBuffer.swift; sourceTree = "<group>"; };
@@ -1273,6 +1277,7 @@
 				BC6FC91D29609A6800A746EE /* ShapeFactory.swift */,
 				29B8768D1CD70AFE00FC07DA /* SoundTransform.swift */,
 				29B8768F1CD70AFE00FC07DA /* VideoEffect.swift */,
+				4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */,
 			);
 			path = Media;
 			sourceTree = "<group>";
@@ -1941,6 +1946,7 @@
 				BC1DC5142A05428800E928ED /* HEVCNALUnit.swift in Sources */,
 				BC6FC9222961B3D800A746EE /* vImage_CGImageFormat+Extension.swift in Sources */,
 				299B13271D3B751400A1E8F5 /* HKView.swift in Sources */,
+				4CCA4A6F2A8A3A730080DEBE /* HKPlayerView.swift in Sources */,
 				BC44A1A923D31E92002D4297 /* AudioCodecRingBuffer.swift in Sources */,
 				BC20DF38250377A3007BC608 /* IOUIScreenCaptureUnit.swift in Sources */,
 				29B876AF1CD70B2800FC07DA /* RTMPChunk.swift in Sources */,
@@ -2161,6 +2167,7 @@
 				BC9F9C7926F8C16600B01ED0 /* Choreographer.swift in Sources */,
 				BC558269240BB40E00011AC0 /* RTMPStreamInfo.swift in Sources */,
 				29EA87E01E79A0810043A5F8 /* CMSampleBuffer+Extension.swift in Sources */,
+				4CCA4A702A8A3A730080DEBE /* HKPlayerView.swift in Sources */,
 				29B8770D1CD70D5A00FC07DA /* NetSocket.swift in Sources */,
 				29B8770E1CD70D5A00FC07DA /* AMF0Serializer.swift in Sources */,
 				2976A4871D49045700B53EF2 /* DeviceUtil.swift in Sources */,
@@ -2321,6 +2328,7 @@
 				29EB3E311ED05A29001CAE8B /* AnyUtil.swift in Sources */,
 				29EB3E1C1ED058A2001CAE8B /* AMF3Serializer.swift in Sources */,
 				29EB3DEE1ED05763001CAE8B /* AudioCodec.swift in Sources */,
+				4CCA4A712A8A3A730080DEBE /* HKPlayerView.swift in Sources */,
 				29EB3E241ED05A02001CAE8B /* RTMPSharedObject.swift in Sources */,
 				29EB3E231ED059FF001CAE8B /* RTMPMuxer.swift in Sources */,
 				29EB3DF11ED0576C001CAE8B /* Constants.swift in Sources */,
