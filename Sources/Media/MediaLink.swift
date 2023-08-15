@@ -13,7 +13,7 @@ final class MediaLink {
     private static let bufferTime = 0.2
     private static let bufferingTime = 0.0
     
-    var isPaused = false {
+    var isPaused = false /*{
         didSet {
             guard isPaused != oldValue else {
                 return
@@ -29,7 +29,7 @@ final class MediaLink {
                 logger.warn(exeption)
             })
         }
-    }
+    }*/
     var hasVideo = false
     var bufferTime = MediaLink.bufferTime
     weak var delegate: (any MediaLinkDelegate)?
@@ -85,6 +85,7 @@ final class MediaLink {
     }
     
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
+        /*
         nstry({
             self.scheduledAudioBuffers.mutate { $0 += 1 }
             self.playerNode.scheduleBuffer(buffer, completionHandler: self.didAVAudioNodeCompletion)
@@ -93,7 +94,7 @@ final class MediaLink {
             }
         }, { exeption in
             logger.warn(exeption)
-        })
+        })*/
     }
     
     private func duration(_ duraiton: Double) -> Double {
