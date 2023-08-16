@@ -35,32 +35,33 @@
                                     <action selector="increasePlaybackSpeed:" destination="S4s-US-fOh" eventType="touchUpInside" id="5X1-wa-nJ7"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p4J-1x-O1c">
-                                <rect key="frame" x="341" y="654" width="30" height="30"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="30" id="8DG-lB-HSj"/>
-                                    <constraint firstAttribute="height" constant="30" id="FcJ-bB-H0R"/>
-                                </constraints>
-                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <state key="normal" title="●"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CXI-ZD-byL">
+                                <rect key="frame" x="120" y="711" width="62" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Start"/>
                                 <connections>
-                                    <action selector="didPlaybackButtonTap:" destination="S4s-US-fOh" eventType="touchDown" id="bAJ-ml-suS"/>
+                                    <action selector="startPlayback:" destination="S4s-US-fOh" eventType="touchUpInside" id="YXx-Y0-Tli"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QAb-S2-slO">
+                                <rect key="frame" x="231" y="711" width="60" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Stop"/>
+                                <connections>
+                                    <action selector="stopPlayback:" destination="S4s-US-fOh" eventType="touchUpInside" id="FTn-Vk-NqA"/>
                                 </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="z9R-Rx-Qeu"/>
                         <color key="backgroundColor" systemColor="systemGray2Color"/>
-                        <constraints>
-                            <constraint firstItem="z9R-Rx-Qeu" firstAttribute="bottom" secondItem="p4J-1x-O1c" secondAttribute="bottom" constant="15" id="4Qz-Gj-1rz"/>
-                            <constraint firstItem="z9R-Rx-Qeu" firstAttribute="trailing" secondItem="p4J-1x-O1c" secondAttribute="trailing" constant="15" id="y0c-uc-INm"/>
-                        </constraints>
                     </view>
                     <connections>
                         <outlet property="decreaseButton" destination="Hb6-cH-XwB" id="eOh-PG-bPp"/>
                         <outlet property="increaseButton" destination="8AI-xv-scp" id="Pd6-Er-wIe"/>
-                        <outlet property="playbackButton" destination="p4J-1x-O1c" id="ZN3-UM-SXt"/>
-                        <outlet property="startPlaybackButton" destination="p4J-1x-O1c" id="NoS-lI-Nns"/>
+                        <outlet property="startPlaybackButton" destination="CXI-ZD-byL" id="mZw-h6-wZ4"/>
+                        <outlet property="stopPlaybackButton" destination="QAb-S2-slO" id="UBK-Su-pUA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="A6d-pe-nwN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -13,12 +13,15 @@ final class PlaybackViewController: UIViewController {
     private var retryCount: Int = 0
     private var pictureInPictureController: AVPictureInPictureController?
     let streamPlayer: HKPlayerView = HKPlayerView()
+    private var running: Bool = false
 
     @IBOutlet weak var increaseButton: UIButton!
     
     @IBOutlet weak var decreaseButton: UIButton!
     
     @IBOutlet weak var startPlaybackButton: UIButton!
+    
+    @IBOutlet weak var stopPlaybackButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,13 +31,12 @@ final class PlaybackViewController: UIViewController {
         view.addSubview(streamPlayer)
         view.bringSubviewToFront(increaseButton)
         view.bringSubviewToFront(decreaseButton)
-        view.bringSubviewToFront(playbackButton)
+        view.bringSubviewToFront(startPlaybackButton)
+        view.bringSubviewToFront(stopPlaybackButton)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //(view as? (any NetStreamDrawable))?.attachStream(rtmpStream)
-        //to delete - testing
         NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
@@ -44,21 +46,31 @@ final class PlaybackViewController: UIViewController {
         
     }
 
-    @IBAction func didPlaybackButtonTap(_ button: UIButton) {
-        if button.isSelected {
-            UIApplication.shared.isIdleTimerDisabled = false
-            rtmpConnection.close()
-            rtmpConnection.removeEventListener(.rtmpStatus, selector: #selector(rtmpStatusHandler), observer: self)
-            rtmpConnection.removeEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
-            button.setTitle("●", for: [])
-        } else {
-            UIApplication.shared.isIdleTimerDisabled = true
-            rtmpConnection.addEventListener(.rtmpStatus, selector: #selector(rtmpStatusHandler), observer: self)
-            rtmpConnection.addEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
-            rtmpConnection.connect(Preference.defaultInstance.uri!)
-            button.setTitle("■", for: [])
+    @IBAction func startPlayback(_ sender: Any) {
+        connectToStream()
+        running = true
+    }
+    
+    
+    @IBAction func stopPlayback(_ sender: Any) {
+        if running {
+            disconnectFromStream()
+            running = false
         }
-        button.isSelected.toggle()
+    }
+    
+    private func connectToStream() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        rtmpConnection.addEventListener(.rtmpStatus, selector: #selector(rtmpStatusHandler), observer: self)
+        rtmpConnection.addEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
+        rtmpConnection.connect(Preference.defaultInstance.uri!)
+    }
+    
+    private func disconnectFromStream() {
+        UIApplication.shared.isIdleTimerDisabled = false
+        rtmpConnection.close()
+        rtmpConnection.removeEventListener(.rtmpStatus, selector: #selector(rtmpStatusHandler), observer: self)
+        rtmpConnection.removeEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
     }
     
     @IBAction func increasePlaybackSpeed(_ sender: Any) {
@@ -102,14 +114,16 @@ final class PlaybackViewController: UIViewController {
 
     @objc
     private func didEnterBackground(_ notification: Notification) {
-        logger.info(notification)
-        rtmpStream.receiveVideo = false
+        if running {
+            disconnectFromStream()
+        }
     }
 
     @objc
     private func didBecomeActive(_ notification: Notification) {
-        logger.info(notification)
-        rtmpStream.receiveVideo = true
+        if running {
+            connectToStream()
+        }
     }
 }
 

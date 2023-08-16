@@ -67,10 +67,6 @@ public class HKPlayerView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-
-    deinit {
-        attachStream(nil)
-    }
     
     public func enqueueNextFrame(_ sampleBuffer: CMSampleBuffer?) {
         if Thread.isMainThread {
@@ -88,24 +84,15 @@ public class HKPlayerView: UIView {
     
 }
 
-extension HKPlayerView: NetStreamDrawable {
-    // MARK: NetStreamDrawable
-    public func attachStream(_ stream: NetStream?) {
-        guard let stream: NetStream = stream else {
-            currentStream = nil
-            return
-        }
-        stream.lockQueue.async {
-            stream.mixer.videoIO.drawable = self
-            self.currentStream = stream
-            stream.mixer.startRunning()
-        }
-    }
+extension HKPlayerView {
 
     public func enqueue(_ sampleBuffer: CMSampleBuffer?) {
         if Thread.isMainThread {
             currentSampleBuffer = sampleBuffer
             if let sampleBuffer = sampleBuffer {
+                if layer.status == .failed {
+                    layer.flushAndRemoveImage()
+                }
                 layer.enqueue(sampleBuffer)
             }
         } else {
@@ -168,10 +155,6 @@ public class HKPlayerView: NSView {
         super.init(coder: aDecoder)
     }
 
-    deinit {
-        attachStream(nil)
-    }
-
     /// Prepares the receiver for service after it has been loaded from an Interface Builder archive, or nib file.
     override public func awakeFromNib() {
         super.awakeFromNib()
@@ -182,19 +165,7 @@ public class HKPlayerView: NSView {
     }
 }
 
-extension HKPlayerView: NetStreamDrawable {
-    // MARK: NetStreamDrawable
-    public func attachStream(_ stream: NetStream?) {
-        guard let stream: NetStream = stream else {
-            currentStream = nil
-            return
-        }
-        stream.lockQueue.async {
-            stream.mixer.videoIO.drawable = self
-            self.currentStream = stream
-            stream.mixer.startRunning()
-        }
-    }
+extension HKPlayerView {
 
     public func enqueue(_ sampleBuffer: CMSampleBuffer?) {
         if Thread.isMainThread {
