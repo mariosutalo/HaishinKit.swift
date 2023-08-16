@@ -104,14 +104,12 @@ final class PlaybackViewController: UIViewController {
     private func didEnterBackground(_ notification: Notification) {
         logger.info(notification)
         rtmpStream.receiveVideo = false
-        rtmpStream.receiveAudio = false
     }
 
     @objc
     private func didBecomeActive(_ notification: Notification) {
         logger.info(notification)
         rtmpStream.receiveVideo = true
-        rtmpStream.receiveAudio = true
     }
 }
 

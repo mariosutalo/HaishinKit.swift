@@ -4,4 +4,15 @@ import Logboard
 import SwiftPMSupport
 #endif
 
-let logger = LBLogger.with(HaishinKitIdentifier)
+let lblogger = LBLogger.with(HaishinKitIdentifier)
+
+var logger: LBLogger {
+    #if DEBUG
+        return lblogger
+    #else
+        lblogger.level = .error
+        return lblogger
+    #endif
+}
+
+

@@ -3,7 +3,18 @@ import HaishinKit
 import Logboard
 import UIKit
 
-let logger = LBLogger.with("com.haishinkit.Exsample.iOS")
+let lblogger = LBLogger.with("com.haishinkit.Exsample.iOS")
+
+let logger: LBLogger = {
+    #if DEBUG
+        print("Debug")
+        return lblogger
+    #else
+        print("Release")
+        lblogger.level = .error
+        return lblogger
+    #endif
+}()
 
 @UIApplicationMain
 final class AppDelegate: UIResponder, UIApplicationDelegate {
