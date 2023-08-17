@@ -11,7 +11,6 @@ final class PlaybackViewController: UIViewController {
     private var rtmpConnection = RTMPConnection()
     private var rtmpStream: RTMPStream!
     private var retryCount: Int = 0
-    private var pictureInPictureController: AVPictureInPictureController?
     let streamPlayer: HKPlayerView = HKPlayerView()
     private var running: Bool = false
 
