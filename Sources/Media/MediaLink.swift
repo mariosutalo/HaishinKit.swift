@@ -4,9 +4,10 @@ import AVFoundation
 import SwiftPMSupport
 #endif
 
+
 protocol MediaLinkDelegate: AnyObject {
     func mediaLink(_ mediaLink: MediaLink, dequeue sampleBuffer: CMSampleBuffer)
-    func mediaLink(_ mediaLink: MediaLink, didBufferingChanged: Bool)
+    func mediaLink(_ mediaLink: MediaLink, _ isBuffering: Bool)
 }
 
 final class MediaLink {
@@ -14,22 +15,22 @@ final class MediaLink {
     private static let bufferingTime = 0.0
     
     var isPaused = false /*{
-        didSet {
-            guard isPaused != oldValue else {
-                return
-            }
-            choreographer.isPaused = isPaused
-            nstry({
-                if self.isPaused {
-                    self.playerNode.pause()
-                } else {
-                    self.playerNode.play()
-                }
-            }, { exeption in
-                logger.warn(exeption)
-            })
-        }
-    }*/
+                          didSet {
+                          guard isPaused != oldValue else {
+                          return
+                          }
+                          choreographer.isPaused = isPaused
+                          nstry({
+                          if self.isPaused {
+                          self.playerNode.pause()
+                          } else {
+                          self.playerNode.play()
+                          }
+                          }, { exeption in
+                          logger.warn(exeption)
+                          })
+                          }
+                          }*/
     var hasVideo = false
     var bufferTime = MediaLink.bufferTime
     weak var delegate: (any MediaLinkDelegate)?
@@ -41,9 +42,18 @@ final class MediaLink {
                 bufferingTime = 0.0
             }
             isPaused = isBuffering
-            delegate?.mediaLink(self, didBufferingChanged: isBuffering)
+            delegate?.mediaLink(self, isBuffering)
         }
     }
+    // added code
+    private var isVideoBuffering = true {
+        willSet {
+            if isVideoBuffering != newValue {
+                delegate?.mediaLink(self, newValue)
+            }
+        }
+    }
+    // end added code
     private var bufferingTime = MediaLink.bufferingTime
     private lazy var choreographer: any Choreographer = {
         var choreographer = DisplayLinkChoreographer()
@@ -74,6 +84,13 @@ final class MediaLink {
         }
         if let bufferQueue {
             CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
+            // added code
+            if bufferQueue.duration.seconds > 0.2 {
+                isVideoBuffering = false
+            } else {
+                isVideoBuffering = true
+            }
+            // end added code
         }
         if isBuffering {
             bufferingTime += buffer.duration.seconds
@@ -85,16 +102,17 @@ final class MediaLink {
     }
     
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
+        // modified code
         /*
-        nstry({
-            self.scheduledAudioBuffers.mutate { $0 += 1 }
-            self.playerNode.scheduleBuffer(buffer, completionHandler: self.didAVAudioNodeCompletion)
-            if !self.hasVideo && !self.playerNode.isPlaying && 10 <= self.scheduledAudioBuffers.value {
-                self.playerNode.play()
-            }
-        }, { exeption in
-            logger.warn(exeption)
-        })*/
+         nstry({
+         self.scheduledAudioBuffers.mutate { $0 += 1 }
+         self.playerNode.scheduleBuffer(buffer, completionHandler: self.didAVAudioNodeCompletion)
+         if !self.hasVideo && !self.playerNode.isPlaying && 10 <= self.scheduledAudioBuffers.value {
+         self.playerNode.play()
+         }
+         }, { exeption in
+         logger.warn(exeption)
+         })*/
     }
     
     private func duration(_ duraiton: Double) -> Double {
@@ -136,7 +154,7 @@ final class MediaLink {
 
 extension MediaLink: ChoreographerDelegate {
     // MARK: ChoreographerDelegate
-    func choreographerr(_ choreographer: any Choreographer, didFrame duration: Double) {
+    /*func choreographerr(_ choreographer: any Choreographer, didFrame duration: Double) {
         guard let bufferQueue else {
             return
         }
@@ -159,7 +177,7 @@ extension MediaLink: ChoreographerDelegate {
             }
         }
         isBuffering = true
-    }
+    }*/
     
     func choreographer(_ choreographer: any Choreographer, didFrame duration: Double) {
         guard let bufferQueue else {
@@ -169,14 +187,9 @@ extension MediaLink: ChoreographerDelegate {
             return
         }
         let first = head as! CMSampleBuffer
-        if bufferQueue.duration.seconds > 0.2 {
-            CMBufferQueueDequeue(bufferQueue)
-            removeTimestampFromBuffer(first)
-            delegate?.mediaLink(self, dequeue: first)
-
-        } else {
-            isBuffering = true
-        }
+        CMBufferQueueDequeue(bufferQueue)
+        removeTimestampFromBuffer(first)
+        delegate?.mediaLink(self, dequeue: first)
     }
 }
 
@@ -190,6 +203,8 @@ extension MediaLink: Running {
             self.hasVideo = false
             self.bufferingTime = Self.bufferingTime
             self.isBuffering = true
+            self.isVideoBuffering = true
+            self.delegate?.mediaLink(self, self.isVideoBuffering)
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }

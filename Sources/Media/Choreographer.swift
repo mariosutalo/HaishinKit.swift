@@ -112,7 +112,6 @@ extension DisplayLinkChoreographer: Running {
         if !timer.isCancelled {
             timer.cancel()
         }
-        //addInitialDelay = true
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {

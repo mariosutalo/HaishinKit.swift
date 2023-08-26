@@ -271,7 +271,10 @@ open class RTMPStream: NetStream {
     private weak var rtmpConnection: RTMPConnection?
     let timerQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.UpdateBufferSize", qos: .default)
     var updateBufferSizeTimer: DispatchSourceTimer? = nil
-    let updateBufferSizeTimerInterval = 0.5
+    let updateBufferSizeTimerInterval = 0.1
+    public var bufferSizeInSeconds: Double {
+        return mixer.mediaLink.bufferSize
+    }
     // end added code
 
     /// Creates a new stream.
@@ -663,8 +666,8 @@ extension RTMPStream {
             guard let self = self else {
                 return
             }
-            let bufferSize = self.mixer.mediaLink.bufferSize
-            delegate?.stream(self, videoBufferSize: bufferSize)
+            //let bufferSize = self.mixer.mediaLink.bufferSize
+            delegate?.stream(self, videoBufferSize: bufferSizeInSeconds)
         }
         timer.resume()
     }

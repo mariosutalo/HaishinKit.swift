@@ -16,6 +16,8 @@ public protocol NetStreamDelegate: AnyObject {
     func stream(_ stream: NetStream, didOutput video: CMSampleBuffer)
     // added code
     func stream(_ stream: NetStream, videoBufferSize: Double)
+    func stream(_ stream: NetStream, isVideoBuffering: Bool)
+    // end added code
     #if os(iOS)
     /// Tells the receiver to session was interrupted.
     func stream(_ stream: NetStream, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?)
@@ -331,6 +333,10 @@ extension NetStream: IOMixerDelegate {
 
     func mixer(_ mixer: IOMixer, didOutput audio: AVAudioPCMBuffer, presentationTimeStamp: CMTime) {
         delegate?.stream(self, didOutput: audio, presentationTimeStamp: presentationTimeStamp)
+    }
+    
+    func mixer(_ mixer: IOMixer, isVideoBuffering: Bool) {
+        delegate?.stream(self, isVideoBuffering: isVideoBuffering)
     }
 
     #if os(iOS)

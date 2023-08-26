@@ -15,6 +15,7 @@ extension AVCaptureSession.Preset {
 protocol IOMixerDelegate: AnyObject {
     func mixer(_ mixer: IOMixer, didOutput audio: AVAudioPCMBuffer, presentationTimeStamp: CMTime)
     func mixer(_ mixer: IOMixer, didOutput video: CMSampleBuffer)
+    func mixer(_ mixer: IOMixer, isVideoBuffering: Bool)
     #if os(iOS)
     func mixer(_ mixer: IOMixer, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?)
     func mixer(_ mixer: IOMixer, sessionInterruptionEnded session: AVCaptureSession)
@@ -312,9 +313,9 @@ extension IOMixer: MediaLinkDelegate {
         drawable?.enqueue(sampleBuffer)
     }
 
-    func mediaLink(_ mediaLink: MediaLink, didBufferingChanged: Bool) {
-        // to revert
-        //logger.info(didBufferingChanged)
+    func mediaLink(_ mediaLink: MediaLink, _ isBuffering: Bool) {
+        // added code
+        delegate?.mixer(self, isVideoBuffering: isBuffering)
     }
 }
 

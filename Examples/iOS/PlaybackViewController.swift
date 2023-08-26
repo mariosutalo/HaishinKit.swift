@@ -127,6 +127,10 @@ final class PlaybackViewController: UIViewController {
 }
 
 extension PlaybackViewController: NetStreamDelegate {
+    func stream(_ stream: HaishinKit.NetStream, isVideoBuffering: Bool) {
+        print("is video buffering: \(isVideoBuffering)")
+    }
+    
     
     func stream(_ stream: NetStream, videoBufferSize: Double) {
         print("buffer size is: \(videoBufferSize)")
