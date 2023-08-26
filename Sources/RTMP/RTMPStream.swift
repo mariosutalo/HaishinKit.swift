@@ -271,7 +271,7 @@ open class RTMPStream: NetStream {
     private weak var rtmpConnection: RTMPConnection?
     let timerQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.UpdateBufferSize", qos: .default)
     var updateBufferSizeTimer: DispatchSourceTimer? = nil
-    let updateBufferSizeTimerInterval = 0.1
+    let updateBufferSizeTimerInterval = 0.5
     public var bufferSizeInSeconds: Double {
         return mixer.mediaLink.bufferSize
     }
