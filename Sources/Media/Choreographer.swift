@@ -20,13 +20,16 @@ protocol Choreographer: Running {
 final class DisplayLinkChoreographer: NSObject, Choreographer {
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
+    // added code
     let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInteractive)
     var dequeBufferThread: Thread!
     var playbackTimer: DispatchSourceTimer!
-    // 24 frames per second
-    let fps: Double = 24
-    var addInitialDelay: Bool = true
-    var initialDequeuDelaySeconds: Double = 0.5
+    let dequeueBufferRateInMs: Double = 1000/24
+    var derivedBufferRateInMs: Double = 1000/24
+    var lastTriggered = Date()
+    var timerIntervalInSeconds: Double = 1/1000
+    
+    // end added code
     
     var isPaused: Bool {
         get {
@@ -115,6 +118,8 @@ extension DisplayLinkChoreographer: Running {
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
+        derivedBufferRateInMs = dequeueBufferRateInMs * playbackSpeed
+        return
         guard let timer = playbackTimer else {
             return
         }
@@ -128,15 +133,18 @@ extension DisplayLinkChoreographer: Running {
 extension DisplayLinkChoreographer {
 
     func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
-        let poolingInterval = 1 / (fps * playbackSpeed)
         playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        playbackTimer.schedule(deadline: .now(), repeating: poolingInterval, leeway: .nanoseconds(0))
+        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalInSeconds, leeway: .nanoseconds(0))
         playbackTimer.setEventHandler() { [weak self] in
             guard let self = self else {
                 return
             }
-            DispatchQueue.main.async {
-                self.update()
+            let currentTime = Date()
+            if currentTime.timeIntervalSince(lastTriggered) * 1000 >= derivedBufferRateInMs {
+                DispatchQueue.main.async {
+                    self.update()
+                }
+                lastTriggered = currentTime
             }
         }
         playbackTimer.resume()

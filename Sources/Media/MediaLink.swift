@@ -11,9 +11,17 @@ protocol MediaLinkDelegate: AnyObject {
 }
 
 final class MediaLink {
+    // added code
+    enum Constants {
+        static let initialBufferSize = 1.0
+        static let minimumBufferSizeForBuffering = 0.5
+        static let minimumBufferSize = 0.2
+    }
+    // end added code
+    
     private static let bufferTime = 0.2
     private static let bufferingTime = 0.0
-    
+
     var isPaused = false /*{
                           didSet {
                           guard isPaused != oldValue else {
@@ -46,6 +54,7 @@ final class MediaLink {
         }
     }
     // added code
+    private var dequeueVideo = false
     private var isVideoBuffering = true {
         willSet {
             if isVideoBuffering != newValue {
@@ -82,16 +91,6 @@ final class MediaLink {
             delegate?.mediaLink(self, dequeue: buffer)
             return
         }
-        if let bufferQueue {
-            CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
-            // added code
-            if bufferQueue.duration.seconds > 0.2 {
-                isVideoBuffering = false
-            } else {
-                isVideoBuffering = true
-            }
-            // end added code
-        }
         if isBuffering {
             bufferingTime += buffer.duration.seconds
             if bufferTime <= bufferingTime {
@@ -99,6 +98,18 @@ final class MediaLink {
                 isBuffering = false
             }
         }
+        guard let bufferQueue = bufferQueue else {
+            return
+        }
+        CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
+        // added code
+        let bufferQueueDuration = bufferQueue.duration.seconds
+        if !dequeueVideo && bufferQueueDuration >= 1 {
+            dequeueVideo = true
+            return
+        }
+        isVideoBuffering = bufferQueueDuration < Constants.minimumBufferSizeForBuffering ? true : false
+        // end added code
     }
     
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
@@ -186,6 +197,9 @@ extension MediaLink: ChoreographerDelegate {
         guard let head = CMBufferQueueGetHead(bufferQueue) else {
             return
         }
+        if !dequeueVideo {
+            return
+        }
         let first = head as! CMSampleBuffer
         CMBufferQueueDequeue(bufferQueue)
         removeTimestampFromBuffer(first)
@@ -203,8 +217,6 @@ extension MediaLink: Running {
             self.hasVideo = false
             self.bufferingTime = Self.bufferingTime
             self.isBuffering = true
-            self.isVideoBuffering = true
-            self.delegate?.mediaLink(self, self.isVideoBuffering)
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }
@@ -221,6 +233,8 @@ extension MediaLink: Running {
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.presentationTimeStampOrigin = .invalid
             self.isRunning.mutate { $0 = false }
+            self.dequeueVideo = false
+            self.isVideoBuffering = true
         }
     }
 }

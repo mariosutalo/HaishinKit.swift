@@ -5,7 +5,7 @@ import HaishinKit
 import UIKit
 
 final class PlaybackViewController: UIViewController {
-    private static let maxRetryCount: Int = 5
+    private static let maxRetryCount: Int = 1
 
     @IBOutlet private weak var playbackButton: UIButton!
     private var rtmpConnection = RTMPConnection()
@@ -88,13 +88,14 @@ final class PlaybackViewController: UIViewController {
         guard let data = e.data as? ASObject, let code = data["code"] as? String else {
             return
         }
-        logger.info(code)
+        //logger.info(code)
         switch code {
         case RTMPConnection.Code.connectSuccess.rawValue:
             retryCount = 0
             rtmpStream.play(Preference.defaultInstance.streamName!)
         case RTMPConnection.Code.connectFailed.rawValue, RTMPConnection.Code.connectClosed.rawValue:
             guard retryCount <= PlaybackViewController.maxRetryCount else {
+                logger.error("Conection failed")
                 return
             }
             Thread.sleep(forTimeInterval: pow(2.0, Double(retryCount)))
@@ -107,7 +108,7 @@ final class PlaybackViewController: UIViewController {
 
     @objc
     private func rtmpErrorHandler(_ notification: Notification) {
-        logger.error(notification)
+        //logger.error("connection error: \(notification)")
         rtmpConnection.connect(Preference.defaultInstance.uri!)
     }
 
