@@ -338,6 +338,10 @@ extension NetStream: IOMixerDelegate {
     func mixer(_ mixer: IOMixer, isVideoBuffering: Bool) {
         delegate?.stream(self, isVideoBuffering: isVideoBuffering)
     }
+    
+    func mixer(_ mixer: IOMixer, bufferSizeSec: Double) {
+        delegate?.stream(self, videoBufferSize: bufferSizeSec)
+    }
 
     #if os(iOS)
     func mixer(_ mixer: IOMixer, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?) {

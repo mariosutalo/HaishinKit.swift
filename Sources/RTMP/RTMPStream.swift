@@ -269,13 +269,6 @@ open class RTMPStream: NetStream {
     private var dataTimeStamps: [String: Date] = .init()
     // added code
     private weak var rtmpConnection: RTMPConnection?
-    let timerQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.UpdateBufferSize", qos: .default)
-    var updateBufferSizeTimer: DispatchSourceTimer? = nil
-    let updateBufferSizeTimerInterval = 0.5
-    public var bufferSizeInSeconds: Double {
-        return mixer.mediaLink.bufferSize
-    }
-    // end added code
 
     /// Creates a new stream.
     public init(connection: RTMPConnection) {
@@ -310,9 +303,6 @@ open class RTMPStream: NetStream {
                 }
                 return
             }
-            // added code
-            self.startSendBufferSizeTimer()
-            // end
             self.info.resourceName = name
             let message = RTMPCommandMessage(
                 streamId: self.id,
@@ -394,8 +384,6 @@ open class RTMPStream: NetStream {
     /// Stops playing or publishing and makes available other uses.
     open func close() {
         close(withLockQueue: true)
-        // added code
-        stopSendBufferSizeTimer()
     }
 
     /// Sends a message on a published stream to all subscribing clients.
@@ -653,34 +641,5 @@ extension RTMPStream {
     
     public func setPlaybackSpeed(playbackSpeed: Double) {
         mixer.mediaLink.playbackChoreographer.setPlaybackSpeed(speed: playbackSpeed)
-    }
-    
-    private func startSendBufferSizeTimer() {
-        cancelSendBufferSizeTimerIfRunning()
-        updateBufferSizeTimer = DispatchSource.makeTimerSource(flags: .strict, queue: timerQueue)
-        guard let timer = updateBufferSizeTimer else {
-            return
-        }
-        timer.schedule(deadline: .now(), repeating: updateBufferSizeTimerInterval, leeway: .nanoseconds(0))
-        timer.setEventHandler() { [weak self] in
-            guard let self = self else {
-                return
-            }
-            //let bufferSize = self.mixer.mediaLink.bufferSize
-            delegate?.stream(self, videoBufferSize: bufferSizeInSeconds)
-        }
-        timer.resume()
-    }
-    
-    private func stopSendBufferSizeTimer() {
-        cancelSendBufferSizeTimerIfRunning()
-    }
-    
-    private func cancelSendBufferSizeTimerIfRunning() {
-        if let timer = updateBufferSizeTimer {
-            if !timer.isCancelled {
-                timer.cancel()
-            }
-        }
     }
 }

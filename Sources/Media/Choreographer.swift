@@ -24,11 +24,11 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInteractive)
     var dequeBufferThread: Thread!
     var playbackTimer: DispatchSourceTimer!
-    let dequeueBufferRateInMs: Double = 1000/24
-    var derivedBufferRateInMs: Double = 1000/24
+    // 24 fps
+    let dequeueBufferRateSeconds: Double = 1 / 24
+    var derivedBufferRateSeconds: Double = 1 / 24
+    let timerIntervalSeconds: Double = 1 / 1000
     var lastTriggered = Date()
-    var timerIntervalInSeconds: Double = 1/1000
-    
     // end added code
     
     var isPaused: Bool {
@@ -58,12 +58,6 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
         duration = Self.duration
     }
     
-    /*@objc
-     private func update(displayLink: DisplayLink) {
-     delegate?.choreographer(self, didFrame: duration)
-     duration += displayLink.duration
-     }*/
-    
     private func update() {
         delegate?.choreographer(self, didFrame: duration)
     }
@@ -83,18 +77,12 @@ extension DisplayLinkChoreographer: Running {
                 guard let self = self else {
                     return
                 }
-                if self.addInitialDelay == true {
-                    Thread.sleep(forTimeInterval: self.initialDequeuDelaySeconds)
-                    self.addInitialDelay = false
-                }
                 self.update()
-                Thread.sleep(forTimeInterval: self.poolingInterval)
+                Thread.sleep(forTimeInterval: self.derivedBufferRateSeconds)
             }
         }
         dequeBufferThread.qualityOfService = .userInteractive
         dequeBufferThread.start()
-     //isRunning.mutate { $0 = true }
-     //displayLink = DisplayLink(target: self, selector: #selector(self.update(displayLink:)))
     }*/
     
     func startRunning() {
@@ -106,8 +94,6 @@ extension DisplayLinkChoreographer: Running {
     }
     
     func stopRunning() {
-        //displayLink = nil
-        //duration = DisplayLinkChoreographer.duration
         isRunning.mutate { $0 = false }
         guard let timer = playbackTimer else {
             return
@@ -118,7 +104,7 @@ extension DisplayLinkChoreographer: Running {
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
-        derivedBufferRateInMs = dequeueBufferRateInMs * playbackSpeed
+        derivedBufferRateSeconds = dequeueBufferRateSeconds / playbackSpeed
         return
         guard let timer = playbackTimer else {
             return
@@ -134,17 +120,18 @@ extension DisplayLinkChoreographer {
 
     func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
         playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalInSeconds, leeway: .nanoseconds(0))
+        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalSeconds, leeway: .nanoseconds(0))
         playbackTimer.setEventHandler() { [weak self] in
             guard let self = self else {
                 return
             }
             let currentTime = Date()
-            if currentTime.timeIntervalSince(lastTriggered) * 1000 >= derivedBufferRateInMs {
-                DispatchQueue.main.async {
+            let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
+            if differenceInTime >= self.derivedBufferRateSeconds {
+                DispatchQueue.main.async(qos: .userInteractive) {
                     self.update()
                 }
-                lastTriggered = currentTime
+                self.lastTriggered = currentTime
             }
         }
         playbackTimer.resume()

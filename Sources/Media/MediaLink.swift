@@ -8,14 +8,15 @@ import SwiftPMSupport
 protocol MediaLinkDelegate: AnyObject {
     func mediaLink(_ mediaLink: MediaLink, dequeue sampleBuffer: CMSampleBuffer)
     func mediaLink(_ mediaLink: MediaLink, _ isBuffering: Bool)
+    func mediaLink(_ mediaLink: MediaLink, bufferSize bufferSizeSec: Double)
 }
 
 final class MediaLink {
     // added code
     enum Constants {
         static let initialBufferSize = 1.0
-        static let minimumBufferSizeForBuffering = 0.5
-        static let minimumBufferSize = 0.2
+        static let minimumBufferSizeForBuffering = 0.1
+        static let minimumBufferSizeForDequeueAfterBuffering = 0.2
     }
     // end added code
     
@@ -50,15 +51,24 @@ final class MediaLink {
                 bufferingTime = 0.0
             }
             isPaused = isBuffering
-            delegate?.mediaLink(self, isBuffering)
+            //delegate?.mediaLink(self, isBuffering)
         }
     }
     // added code
     private var dequeueVideo = false
+    private var minimumBufferSizeForDequeue = Constants.initialBufferSize
     private var isVideoBuffering = true {
         willSet {
             if isVideoBuffering != newValue {
-                delegate?.mediaLink(self, newValue)
+                if newValue {
+                    minimumBufferSizeForDequeue = Constants.minimumBufferSizeForDequeueAfterBuffering
+                }
+                bufferInfoQueue.async {[weak self] in
+                    guard let self = self else {
+                        return
+                    }
+                    self.delegate?.mediaLink(self, newValue)
+                }
             }
         }
     }
@@ -78,6 +88,7 @@ final class MediaLink {
     public var bufferSize: Double {
         bufferQueue?.duration.seconds ?? 0
     }
+    let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue", qos: .userInteractive)
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
@@ -88,32 +99,41 @@ final class MediaLink {
             presentationTimeStampOrigin = buffer.presentationTimeStamp
         }
         if buffer.presentationTimeStamp == presentationTimeStampOrigin {
-            delegate?.mediaLink(self, dequeue: buffer)
             return
         }
-        if isBuffering {
+        /*if isBuffering {
             bufferingTime += buffer.duration.seconds
             if bufferTime <= bufferingTime {
                 bufferTime += 0.1
                 isBuffering = false
             }
-        }
+        }*/
         guard let bufferQueue = bufferQueue else {
             return
         }
+        
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
-        // added code
+        bufferInfoQueue.async { [weak self] in
+            guard let self = self else{
+                return
+            }
+            self.delegate?.mediaLink(self, bufferSize: bufferQueue.duration.seconds)
+
+        }
         let bufferQueueDuration = bufferQueue.duration.seconds
-        if !dequeueVideo && bufferQueueDuration >= 1 {
+        if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSize {
             dequeueVideo = true
+        }
+        if !dequeueVideo {
             return
         }
-        isVideoBuffering = bufferQueueDuration < Constants.minimumBufferSizeForBuffering ? true : false
-        // end added code
+        isVideoBuffering = bufferQueueDuration <= Constants.minimumBufferSizeForBuffering
+        if bufferQueueDuration > Constants.minimumBufferSizeForDequeueAfterBuffering {
+            minimumBufferSizeForDequeue = Constants.minimumBufferSizeForBuffering
+        }
     }
     
     func enqueueAudio(_ buffer: AVAudioPCMBuffer) {
-        // modified code
         /*
          nstry({
          self.scheduledAudioBuffers.mutate { $0 += 1 }
@@ -164,45 +184,21 @@ final class MediaLink {
 }
 
 extension MediaLink: ChoreographerDelegate {
-    // MARK: ChoreographerDelegate
-    /*func choreographerr(_ choreographer: any Choreographer, didFrame duration: Double) {
+
+    func choreographer(_ choreographer: any Choreographer, didFrame duration: Double) {
         guard let bufferQueue else {
             return
         }
-        let duration = self.duration(duration)
-        var frameCount = 0
-        while !CMBufferQueueIsEmpty(bufferQueue) {
-            guard let head = CMBufferQueueGetHead(bufferQueue) else {
-                break
-            }
-            let first = head as! CMSampleBuffer
-            if first.presentationTimeStamp.seconds - presentationTimeStampOrigin.seconds <= duration {
-                delegate?.mediaLink(self, dequeue: first)
-                frameCount += 1
-                CMBufferQueueDequeue(bufferQueue)
-            } else {
-                if 2 < frameCount {
-                    logger.info("droppedFrame: \(frameCount)")
-                }
-                return
-            }
-        }
-        isBuffering = true
-    }*/
-    
-    func choreographer(_ choreographer: any Choreographer, didFrame duration: Double) {
-        guard let bufferQueue else {
+        if bufferQueue.duration.seconds < minimumBufferSizeForDequeue {
             return
         }
         guard let head = CMBufferQueueGetHead(bufferQueue) else {
             return
         }
-        if !dequeueVideo {
-            return
-        }
         let first = head as! CMSampleBuffer
         CMBufferQueueDequeue(bufferQueue)
-        removeTimestampFromBuffer(first)
+        //removeTimestampFromBuffer(first)
+        
         delegate?.mediaLink(self, dequeue: first)
     }
 }
@@ -220,6 +216,7 @@ extension MediaLink: Running {
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }
+            self.dequeueVideo = false
         }
     }
     
@@ -233,8 +230,6 @@ extension MediaLink: Running {
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.presentationTimeStampOrigin = .invalid
             self.isRunning.mutate { $0 = false }
-            self.dequeueVideo = false
-            self.isVideoBuffering = true
         }
     }
 }
