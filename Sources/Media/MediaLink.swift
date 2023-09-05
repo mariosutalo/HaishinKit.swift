@@ -14,9 +14,14 @@ protocol MediaLinkDelegate: AnyObject {
 final class MediaLink {
     // added code
     enum Constants {
-        static let initialBufferSize = 1.0
-        static let minimumBufferSizeForBuffering = 0.1
-        static let minimumBufferSizeForDequeueAfterBuffering = 0.2
+        // on player start, wait 1 seconds for buffer to fill, then start dequeing buffer
+        static let initialBufferSizeForDequeue = 1.0
+        // minimum buffer size for dequeue
+        static let bufferSizeForDequeue = 0.0
+        // minimum buffer size for dequeue after player is buffering, doesnt start dequeing until this values
+        static let bufferSizeForDequeueAfterBuffering = 0.6
+        // send isBuffering signal to delegate when buffer is this value or lower
+        static let startBufferingBufferSize = 0.2
     }
     // end added code
     
@@ -56,12 +61,12 @@ final class MediaLink {
     }
     // added code
     private var dequeueVideo = false
-    private var minimumBufferSizeForDequeue = Constants.initialBufferSize
+    private var minimumBufferSizeForDequeue = Constants.initialBufferSizeForDequeue
     private var isVideoBuffering = true {
         willSet {
             if isVideoBuffering != newValue {
                 if newValue {
-                    minimumBufferSizeForDequeue = Constants.minimumBufferSizeForDequeueAfterBuffering
+                    minimumBufferSizeForDequeue = Constants.bufferSizeForDequeueAfterBuffering
                 }
                 bufferInfoQueue.async {[weak self] in
                     guard let self = self else {
@@ -113,23 +118,23 @@ final class MediaLink {
         }
         
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
+        let bufferQueueDuration = bufferQueue.duration.seconds
         bufferInfoQueue.async { [weak self] in
             guard let self = self else{
                 return
             }
-            self.delegate?.mediaLink(self, bufferSize: bufferQueue.duration.seconds)
+            self.delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
 
         }
-        let bufferQueueDuration = bufferQueue.duration.seconds
-        if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSize {
+        if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
         if !dequeueVideo {
             return
         }
-        isVideoBuffering = bufferQueueDuration <= Constants.minimumBufferSizeForBuffering
-        if bufferQueueDuration > Constants.minimumBufferSizeForDequeueAfterBuffering {
-            minimumBufferSizeForDequeue = Constants.minimumBufferSizeForBuffering
+        isVideoBuffering = bufferQueueDuration <= Constants.startBufferingBufferSize
+        if bufferQueueDuration > Constants.bufferSizeForDequeueAfterBuffering {
+            minimumBufferSizeForDequeue = Constants.bufferSizeForDequeue
         }
     }
     
