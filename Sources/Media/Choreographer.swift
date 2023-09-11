@@ -65,32 +65,13 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
 
 extension DisplayLinkChoreographer: Running {
     
-    
-    /*func startRunning() {
-        if isRunning.value == true {
-            return
-        }
-        isRunning.mutate { $0 = true }
-        dequeBufferThread = Thread() { [weak self] in
-
-            while(self?.isRunning.value == true) {
-                guard let self = self else {
-                    return
-                }
-                self.update()
-                Thread.sleep(forTimeInterval: self.derivedBufferRateSeconds)
-            }
-        }
-        dequeBufferThread.qualityOfService = .userInteractive
-        dequeBufferThread.start()
-    }*/
-    
     func startRunning() {
         if isRunning.value == true {
             return
         }
         isRunning.mutate { $0 = true }
         initializeAndStartPlaybackTimer(speed: 1.0)
+        logger.info("Playback timer started")
     }
     
     func stopRunning() {
@@ -100,19 +81,20 @@ extension DisplayLinkChoreographer: Running {
         }
         if !timer.isCancelled {
             timer.cancel()
+            logger.info("Playback timer canceled")
         }
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
         derivedBufferRateSeconds = dequeueBufferRateSeconds / playbackSpeed
         return
-        guard let timer = playbackTimer else {
+        /*guard let timer = playbackTimer else {
             return
         }
         if !timer.isCancelled {
             timer.cancel()
         }
-        initializeAndStartPlaybackTimer(speed: playbackSpeed)
+        initializeAndStartPlaybackTimer(speed: playbackSpeed)*/
     }
 }
 

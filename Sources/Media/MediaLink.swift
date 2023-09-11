@@ -19,9 +19,11 @@ final class MediaLink {
         // minimum buffer size for dequeue
         static let bufferSizeForDequeue = 0.0
         // minimum buffer size for dequeue after player is buffering, doesnt start dequeing until this values
-        static let bufferSizeForDequeueAfterBuffering = 0.6
+        static let bufferSizeForDequeueAfterBuffering = 0.8
         // send isBuffering signal to delegate when buffer is this value or lower
         static let startBufferingBufferSize = 0.2
+        // maximum buffer size, when this size is exceeded, buffer is dequeued to initial buffer size
+        static let maxBufferSize = 3.0
     }
     // end added code
     
@@ -89,11 +91,12 @@ final class MediaLink {
     private var scheduledAudioBuffers: Atomic<Int> = .init(0)
     private var presentationTimeStampOrigin: CMTime = .invalid
     // added code
-    private var counter: Int = 0
     public var bufferSize: Double {
         bufferQueue?.duration.seconds ?? 0
     }
     let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue", qos: .userInteractive)
+    var updateBufferSizeTimer: DispatchSourceTimer!
+    let updateBufferSizeIntervalSeconds: Double = 1 / 24
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
@@ -119,13 +122,6 @@ final class MediaLink {
         
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
         let bufferQueueDuration = bufferQueue.duration.seconds
-        bufferInfoQueue.async { [weak self] in
-            guard let self = self else{
-                return
-            }
-            self.delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
-
-        }
         if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
@@ -194,8 +190,13 @@ extension MediaLink: ChoreographerDelegate {
         guard let bufferQueue else {
             return
         }
-        if bufferQueue.duration.seconds < minimumBufferSizeForDequeue {
+        if bufferSize < minimumBufferSizeForDequeue {
             return
+        }
+        if bufferSize > Constants.maxBufferSize {
+            while bufferSize > Constants.initialBufferSizeForDequeue {
+                CMBufferQueueDequeue(bufferQueue)
+            }
         }
         guard let head = CMBufferQueueGetHead(bufferQueue) else {
             return
@@ -218,10 +219,12 @@ extension MediaLink: Running {
             self.hasVideo = false
             self.bufferingTime = Self.bufferingTime
             self.isBuffering = true
+            self.minimumBufferSizeForDequeue = Constants.initialBufferSizeForDequeue
+            self.dequeueVideo = false
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }
-            self.dequeueVideo = false
+            self.initializeAndStartUpdateBufferSizeTimer()
         }
     }
     
@@ -231,10 +234,16 @@ extension MediaLink: Running {
                 return
             }
             self.choreographer.stopRunning()
+            do {
+                try self.bufferQueue?.reset()
+            } catch {
+                logger.error("Buffer queue reset error")
+            }
             self.bufferQueue = nil
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.presentationTimeStampOrigin = .invalid
             self.isRunning.mutate { $0 = false }
+            self.stopUpdateBufferSizeTimer()
         }
     }
 }
@@ -242,5 +251,28 @@ extension MediaLink: Running {
 extension MediaLink {
     var playbackChoreographer: Choreographer {
         return choreographer
+    }
+    
+    func initializeAndStartUpdateBufferSizeTimer(){
+        updateBufferSizeTimer = DispatchSource.makeTimerSource(flags: .strict, queue: bufferInfoQueue)
+        updateBufferSizeTimer.schedule(deadline: .now(), repeating: updateBufferSizeIntervalSeconds, leeway: .nanoseconds(0))
+        updateBufferSizeTimer.setEventHandler() { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.delegate?.mediaLink(self, bufferSize: bufferSize)
+        }
+        logger.info("Update buffer size timer started")
+        updateBufferSizeTimer.resume()
+    }
+    
+    func stopUpdateBufferSizeTimer () {
+        guard let timer = updateBufferSizeTimer else {
+            return
+        }
+        if !timer.isCancelled {
+            timer.cancel()
+            logger.info("Update buffer size timer stopped")
+        }
     }
 }

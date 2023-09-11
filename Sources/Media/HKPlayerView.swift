@@ -18,7 +18,6 @@ public class HKPlayerView: UIView {
     override public class var layerClass: AnyClass {
         AVSampleBufferDisplayLayer.self
     }
-
     /// The view’s Core Animation layer used for rendering.
     override public var layer: AVSampleBufferDisplayLayer {
         super.layer as! AVSampleBufferDisplayLayer
