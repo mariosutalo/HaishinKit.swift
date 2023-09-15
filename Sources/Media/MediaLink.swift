@@ -15,7 +15,7 @@ final class MediaLink {
     // added code
     enum Constants {
         // on player start, wait 1 seconds for buffer to fill, then start dequeing buffer
-        static let initialBufferSizeForDequeue = 1.0
+        static let initialBufferSizeForDequeue = 1.2
         // minimum buffer size for dequeue
         static let bufferSizeForDequeue = 0.0
         // minimum buffer size for dequeue after player is buffering, doesnt start dequeing until this values
@@ -89,33 +89,28 @@ final class MediaLink {
     private let lockQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.DisplayLinkedQueue.lock")
     private var bufferQueue: CMBufferQueue?
     private var scheduledAudioBuffers: Atomic<Int> = .init(0)
-    private var presentationTimeStampOrigin: CMTime = .invalid
+    private var lastPresentationTimeStamp: CMTime = .invalid
     // added code
     public var bufferSize: Double {
         bufferQueue?.duration.seconds ?? 0
     }
     let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue", qos: .userInteractive)
     var updateBufferSizeTimer: DispatchSourceTimer!
-    let updateBufferSizeIntervalSeconds: Double = 1 / 24
+    let updateBufferSizeIntervalSeconds: Double = 1 / 20
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
         guard buffer.presentationTimeStamp != .invalid else {
             return
         }
-        if presentationTimeStampOrigin == .invalid {
-            presentationTimeStampOrigin = buffer.presentationTimeStamp
+        if lastPresentationTimeStamp == .invalid {
+            choreographer.frameDurationSeconds = buffer.presentationTimeStamp.seconds
+        } else {
+            let difference = buffer.presentationTimeStamp.seconds - lastPresentationTimeStamp.seconds
+            choreographer.frameDurationSeconds = difference
         }
-        if buffer.presentationTimeStamp == presentationTimeStampOrigin {
-            return
-        }
-        /*if isBuffering {
-            bufferingTime += buffer.duration.seconds
-            if bufferTime <= bufferingTime {
-                bufferTime += 0.1
-                isBuffering = false
-            }
-        }*/
+        lastPresentationTimeStamp = buffer.presentationTimeStamp
+
         guard let bufferQueue = bufferQueue else {
             return
         }
@@ -241,7 +236,7 @@ extension MediaLink: Running {
             }
             self.bufferQueue = nil
             self.scheduledAudioBuffers.mutate { $0 = 0 }
-            self.presentationTimeStampOrigin = .invalid
+            self.lastPresentationTimeStamp = .invalid
             self.isRunning.mutate { $0 = false }
             self.stopUpdateBufferSizeTimer()
         }

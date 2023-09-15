@@ -12,12 +12,14 @@ protocol ChoreographerDelegate: AnyObject {
 
 protocol Choreographer: Running {
     var isPaused: Bool { get set }
+    var frameDurationSeconds: Double { get set }
     var delegate: (any ChoreographerDelegate)? { get set }
     func clear()
     func setPlaybackSpeed(speed playbackSpeed: Double)
 }
 
 final class DisplayLinkChoreographer: NSObject, Choreographer {
+    
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
     // added code
@@ -25,9 +27,10 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     var dequeBufferThread: Thread!
     var playbackTimer: DispatchSourceTimer!
     // 24 fps
-    let dequeueBufferRateSeconds: Double = 1 / 24
+    var frameDurationSeconds: Double = 0.042 // same as 24 fps - initial framerate
+    //var dequeueBufferRateSeconds: Double = 1 / 24
     var derivedBufferRateSeconds: Double = 1 / 24
-    let timerIntervalSeconds: Double = 1 / 1000
+    let timerIntervalSeconds: Double = 1 / 2000
     var lastTriggered = Date()
     // end added code
     
@@ -86,15 +89,9 @@ extension DisplayLinkChoreographer: Running {
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
-        derivedBufferRateSeconds = dequeueBufferRateSeconds / playbackSpeed
+        derivedBufferRateSeconds = frameDurationSeconds / playbackSpeed
+        //derivedBufferRateSeconds = dequeueBufferRateSeconds / playbackSpeed
         return
-        /*guard let timer = playbackTimer else {
-            return
-        }
-        if !timer.isCancelled {
-            timer.cancel()
-        }
-        initializeAndStartPlaybackTimer(speed: playbackSpeed)*/
     }
 }
 
