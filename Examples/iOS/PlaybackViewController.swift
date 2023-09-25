@@ -132,6 +132,9 @@ extension PlaybackViewController: NetStreamDelegate {
         print("is video buffering: \(isVideoBuffering)")
     }
     
+    func stream(_ strem: NetStream, frameRate: Double) {
+        print("frame rate: \(frameRate)")
+    }
     
     func stream(_ stream: NetStream, videoBufferSize: Double) {
         print("buffer size is: \(videoBufferSize)")

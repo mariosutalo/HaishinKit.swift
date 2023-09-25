@@ -9,17 +9,18 @@ protocol MediaLinkDelegate: AnyObject {
     func mediaLink(_ mediaLink: MediaLink, dequeue sampleBuffer: CMSampleBuffer)
     func mediaLink(_ mediaLink: MediaLink, _ isBuffering: Bool)
     func mediaLink(_ mediaLink: MediaLink, bufferSize bufferSizeSec: Double)
+    func mediaLink(_ mediaLind: MediaLink, frameRate: Double)
 }
 
 final class MediaLink {
     // added code
     enum Constants {
         // on player start, wait 1 seconds for buffer to fill, then start dequeing buffer
-        static let initialBufferSizeForDequeue = 1.2
+        static let initialBufferSizeForDequeue = 1.0
         // minimum buffer size for dequeue
         static let bufferSizeForDequeue = 0.0
         // minimum buffer size for dequeue after player is buffering, doesnt start dequeing until this values
-        static let bufferSizeForDequeueAfterBuffering = 0.8
+        static let bufferSizeForDequeueAfterBuffering = 0.6
         // send isBuffering signal to delegate when buffer is this value or lower
         static let startBufferingBufferSize = 0.2
         // maximum buffer size, when this size is exceeded, buffer is dequeued to initial buffer size
@@ -94,7 +95,7 @@ final class MediaLink {
     public var bufferSize: Double {
         bufferQueue?.duration.seconds ?? 0
     }
-    let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue", qos: .userInteractive)
+    let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue")
     var updateBufferSizeTimer: DispatchSourceTimer!
     let updateBufferSizeIntervalSeconds: Double = 1 / 20
     // end added code
@@ -107,6 +108,7 @@ final class MediaLink {
             choreographer.frameDurationSeconds = buffer.presentationTimeStamp.seconds
         } else {
             let difference = buffer.presentationTimeStamp.seconds - lastPresentationTimeStamp.seconds
+            delegate?.mediaLink(self, frameRate: 1 / difference)
             choreographer.frameDurationSeconds = difference
         }
         lastPresentationTimeStamp = buffer.presentationTimeStamp
@@ -116,6 +118,7 @@ final class MediaLink {
         }
         
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
+        //delegate?.mediaLink(self, bufferSize: bufferSize)
         let bufferQueueDuration = bufferQueue.duration.seconds
         if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true

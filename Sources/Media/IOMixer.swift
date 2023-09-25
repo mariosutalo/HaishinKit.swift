@@ -17,6 +17,7 @@ protocol IOMixerDelegate: AnyObject {
     func mixer(_ mixer: IOMixer, didOutput video: CMSampleBuffer)
     func mixer(_ mixer: IOMixer, isVideoBuffering: Bool)
     func mixer(_ mixer: IOMixer, bufferSizeSec: Double)
+    func mixer(_ mixer: IOMixer, frameRate: Double)
     #if os(iOS)
     func mixer(_ mixer: IOMixer, sessionWasInterrupted session: AVCaptureSession, reason: AVCaptureSession.InterruptionReason?)
     func mixer(_ mixer: IOMixer, sessionInterruptionEnded session: AVCaptureSession)
@@ -321,6 +322,10 @@ extension IOMixer: MediaLinkDelegate {
     
     func mediaLink(_ mediaLink: MediaLink, bufferSize bufferSizeSec: Double) {
         delegate?.mixer(self, bufferSizeSec: bufferSizeSec)
+    }
+    
+    func mediaLink(_ mediaLind: MediaLink, frameRate: Double) {
+        delegate?.mixer(self, frameRate: frameRate)
     }
 }
 

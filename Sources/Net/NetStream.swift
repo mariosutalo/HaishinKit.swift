@@ -17,6 +17,7 @@ public protocol NetStreamDelegate: AnyObject {
     // added code
     func stream(_ stream: NetStream, videoBufferSize: Double)
     func stream(_ stream: NetStream, isVideoBuffering: Bool)
+    func stream(_ strem: NetStream, frameRate: Double)
     // end added code
     #if os(iOS)
     /// Tells the receiver to session was interrupted.
@@ -341,6 +342,9 @@ extension NetStream: IOMixerDelegate {
     
     func mixer(_ mixer: IOMixer, bufferSizeSec: Double) {
         delegate?.stream(self, videoBufferSize: bufferSizeSec)
+    }
+    func mixer(_ mixer: IOMixer, frameRate: Double) {
+        delegate?.stream(self, frameRate: frameRate)
     }
 
     #if os(iOS)

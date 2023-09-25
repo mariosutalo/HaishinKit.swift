@@ -23,13 +23,12 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
     // added code
-    let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInteractive)
+    let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .default)
     var dequeBufferThread: Thread!
     var playbackTimer: DispatchSourceTimer!
     // 24 fps
-    var frameDurationSeconds: Double = 0.042 // same as 24 fps - initial framerate
-    //var dequeueBufferRateSeconds: Double = 1 / 24
-    var derivedBufferRateSeconds: Double = 1 / 24
+    var frameDurationSeconds: Double = 0.041 // same as 24 fps - initial framerate
+    var dequeueBufferRateSeconds: Double = 1 / 24
     let timerIntervalSeconds: Double = 1 / 2000
     var lastTriggered = Date()
     // end added code
@@ -89,9 +88,7 @@ extension DisplayLinkChoreographer: Running {
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
-        derivedBufferRateSeconds = frameDurationSeconds / playbackSpeed
-        //derivedBufferRateSeconds = dequeueBufferRateSeconds / playbackSpeed
-        return
+        dequeueBufferRateSeconds = frameDurationSeconds / playbackSpeed
     }
 }
 
@@ -106,8 +103,8 @@ extension DisplayLinkChoreographer {
             }
             let currentTime = Date()
             let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
-            if differenceInTime >= self.derivedBufferRateSeconds {
-                DispatchQueue.main.async(qos: .userInteractive) {
+            if differenceInTime >= self.dequeueBufferRateSeconds {
+                DispatchQueue.main.async() {
                     self.update()
                 }
                 self.lastTriggered = currentTime
