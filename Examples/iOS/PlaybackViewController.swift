@@ -73,12 +73,10 @@ final class PlaybackViewController: UIViewController {
     }
     
     @IBAction func increasePlaybackSpeed(_ sender: Any) {
-        print("new playback speed: 4")
         rtmpStream.setPlaybackSpeed(playbackSpeed: 4)
     }
     
     @IBAction func decreasePlaybackSpeed(_ sender: Any) {
-        print("new playback speed: 0.2")
         rtmpStream.setPlaybackSpeed(playbackSpeed: 0.2)
     }
     
@@ -129,15 +127,12 @@ final class PlaybackViewController: UIViewController {
 
 extension PlaybackViewController: NetStreamDelegate {
     func stream(_ stream: HaishinKit.NetStream, isVideoBuffering: Bool) {
-        print("is video buffering: \(isVideoBuffering)")
     }
     
     func stream(_ strem: NetStream, frameRate: Double) {
-        print("frame rate: \(frameRate)")
     }
     
     func stream(_ stream: NetStream, videoBufferSize: Double) {
-        print("buffer size is: \(videoBufferSize)")
     }
     
     func stream(_ stream: NetStream, didOutput audio: AVAudioBuffer, presentationTimeStamp: CMTime) {
