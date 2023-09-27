@@ -97,7 +97,7 @@ final class MediaLink {
     }
     let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue")
     var updateBufferSizeTimer: DispatchSourceTimer!
-    let updateBufferSizeIntervalSeconds: Double = 1 / 20
+    let updateBufferSizeIntervalSeconds: Double = 1 / 10
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
@@ -118,8 +118,8 @@ final class MediaLink {
         }
         
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
-        //delegate?.mediaLink(self, bufferSize: bufferSize)
         let bufferQueueDuration = bufferQueue.duration.seconds
+        delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
         if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
@@ -175,7 +175,7 @@ final class MediaLink {
     private func makeBufferkQueue() {
         CMBufferQueueCreate(
             allocator: kCFAllocatorDefault,
-            capacity: 256,
+            capacity: 1024,
             callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
             queueOut: &bufferQueue
         )
@@ -201,8 +201,7 @@ extension MediaLink: ChoreographerDelegate {
         }
         let first = head as! CMSampleBuffer
         CMBufferQueueDequeue(bufferQueue)
-        //removeTimestampFromBuffer(first)
-        
+        removeTimestampFromBuffer(first)
         delegate?.mediaLink(self, dequeue: first)
     }
 }
@@ -222,7 +221,7 @@ extension MediaLink: Running {
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }
-            self.initializeAndStartUpdateBufferSizeTimer()
+            //self.initializeAndStartUpdateBufferSizeTimer()
         }
     }
     
@@ -241,7 +240,7 @@ extension MediaLink: Running {
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.lastPresentationTimeStamp = .invalid
             self.isRunning.mutate { $0 = false }
-            self.stopUpdateBufferSizeTimer()
+            //self.stopUpdateBufferSizeTimer()
         }
     }
 }

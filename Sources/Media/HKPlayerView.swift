@@ -100,6 +100,10 @@ extension HKPlayerView {
             }
         }
     }
+    
+    public func flushLayerContent() {
+        layer.flushAndRemoveImage()
+    }
 }
 #else
 

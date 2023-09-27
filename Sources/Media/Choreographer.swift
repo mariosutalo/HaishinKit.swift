@@ -29,7 +29,7 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     // 24 fps
     var frameDurationSeconds: Double = 0.041 // same as 24 fps - initial framerate
     var dequeueBufferRateSeconds: Double = 1 / 24
-    let timerIntervalSeconds: Double = 1 / 2000
+    let timerIntervalSeconds: Double = 1 / 1000
     var lastTriggered = Date()
     // end added code
     
@@ -96,7 +96,7 @@ extension DisplayLinkChoreographer {
 
     func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
         playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalSeconds, leeway: .nanoseconds(0))
+        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalSeconds, leeway: .milliseconds(1))
         playbackTimer.setEventHandler() { [weak self] in
             guard let self = self else {
                 return
@@ -104,9 +104,7 @@ extension DisplayLinkChoreographer {
             let currentTime = Date()
             let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
             if differenceInTime >= self.dequeueBufferRateSeconds {
-                DispatchQueue.main.async() {
-                    self.update()
-                }
+                self.update()
                 self.lastTriggered = currentTime
             }
         }

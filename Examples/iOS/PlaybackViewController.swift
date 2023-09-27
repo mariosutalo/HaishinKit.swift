@@ -46,6 +46,10 @@ final class PlaybackViewController: UIViewController {
     }
 
     @IBAction func startPlayback(_ sender: Any) {
+        if running {
+            return
+        }
+        streamPlayer.flushLayerContent()
         connectToStream()
         running = true
     }
@@ -73,7 +77,7 @@ final class PlaybackViewController: UIViewController {
     }
     
     @IBAction func increasePlaybackSpeed(_ sender: Any) {
-        rtmpStream.setPlaybackSpeed(playbackSpeed: 4)
+        rtmpStream.setPlaybackSpeed(playbackSpeed: 1.1)
     }
     
     @IBAction func decreasePlaybackSpeed(_ sender: Any) {
@@ -107,7 +111,7 @@ final class PlaybackViewController: UIViewController {
     @objc
     private func rtmpErrorHandler(_ notification: Notification) {
         //logger.error("connection error: \(notification)")
-        rtmpConnection.connect(Preference.defaultInstance.uri!)
+        //rtmpConnection.connect(Preference.defaultInstance.uri!)
     }
 
     @objc
