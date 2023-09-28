@@ -97,7 +97,7 @@ final class MediaLink {
     }
     let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue")
     var updateBufferSizeTimer: DispatchSourceTimer!
-    let updateBufferSizeIntervalSeconds: Double = 1 / 10
+    let updateBufferSizeIntervalSeconds: Double = 1 / 1000
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
