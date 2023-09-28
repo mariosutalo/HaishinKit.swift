@@ -96,8 +96,6 @@ final class MediaLink {
         bufferQueue?.duration.seconds ?? 0
     }
     let bufferInfoQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.BufferQueue")
-    var updateBufferSizeTimer: DispatchSourceTimer!
-    let updateBufferSizeIntervalSeconds: Double = 1 / 1000
     // end added code
     
     func enqueueVideo(_ buffer: CMSampleBuffer) {
@@ -221,7 +219,6 @@ extension MediaLink: Running {
             self.choreographer.startRunning()
             self.makeBufferkQueue()
             self.isRunning.mutate { $0 = true }
-            //self.initializeAndStartUpdateBufferSizeTimer()
         }
     }
     
@@ -240,7 +237,6 @@ extension MediaLink: Running {
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.lastPresentationTimeStamp = .invalid
             self.isRunning.mutate { $0 = false }
-            //self.stopUpdateBufferSizeTimer()
         }
     }
 }
@@ -248,28 +244,5 @@ extension MediaLink: Running {
 extension MediaLink {
     var playbackChoreographer: Choreographer {
         return choreographer
-    }
-    
-    func initializeAndStartUpdateBufferSizeTimer(){
-        updateBufferSizeTimer = DispatchSource.makeTimerSource(flags: .strict, queue: bufferInfoQueue)
-        updateBufferSizeTimer.schedule(deadline: .now(), repeating: updateBufferSizeIntervalSeconds, leeway: .nanoseconds(0))
-        updateBufferSizeTimer.setEventHandler() { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.delegate?.mediaLink(self, bufferSize: bufferSize)
-        }
-        logger.info("Update buffer size timer started")
-        updateBufferSizeTimer.resume()
-    }
-    
-    func stopUpdateBufferSizeTimer () {
-        guard let timer = updateBufferSizeTimer else {
-            return
-        }
-        if !timer.isCancelled {
-            timer.cancel()
-            logger.info("Update buffer size timer stopped")
-        }
     }
 }
