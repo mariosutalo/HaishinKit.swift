@@ -23,10 +23,7 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
     // added code
-    let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .default)
     var dequeBufferThread: Thread!
-    var playbackTimer: DispatchSourceTimer!
-    // 24 fps
     var frameDurationSeconds: Double = 0.041 // same as 24 fps - initial framerate
     var dequeueBufferRateSeconds: Double = 1 / 24
     let timerIntervalSeconds: Double = 1 / 1000
@@ -66,16 +63,7 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
 }
 
 extension DisplayLinkChoreographer: Running {
-    
-    /*func startRunning() {
-        if isRunning.value == true {
-            return
-        }
-        isRunning.mutate { $0 = true }
-        initializeAndStartPlaybackTimer(speed: 1.0)
-        logger.info("Playback timer started")
-    }*/
-    
+        
     func startRunning() {
         if isRunning.value == true {
             return
@@ -97,37 +85,9 @@ extension DisplayLinkChoreographer: Running {
     
     func stopRunning() {
         isRunning.mutate { $0 = false }
-        
-        /*guard let timer = playbackTimer else {
-            return
-        }
-        if !timer.isCancelled {
-            timer.cancel()
-            logger.info("Playback timer canceled")
-        }*/
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
         dequeueBufferRateSeconds = frameDurationSeconds / playbackSpeed
-    }
-}
-
-extension DisplayLinkChoreographer {
-
-    func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
-        playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalSeconds, leeway: .milliseconds(1))
-        playbackTimer.setEventHandler() { [weak self] in
-            guard let self = self else {
-                return
-            }
-            let currentTime = Date()
-            let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
-            if differenceInTime >= self.dequeueBufferRateSeconds {
-                self.update()
-                self.lastTriggered = currentTime
-            }
-        }
-        playbackTimer.resume()
     }
 }
