@@ -106,7 +106,12 @@ final class MediaLink {
             choreographer.frameDurationSeconds = buffer.presentationTimeStamp.seconds
         } else {
             let difference = buffer.presentationTimeStamp.seconds - lastPresentationTimeStamp.seconds
-            delegate?.mediaLink(self, frameRate: 1 / difference)
+            bufferInfoQueue.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                delegate?.mediaLink(self, frameRate: 1 / difference)
+            }
             choreographer.frameDurationSeconds = difference
         }
         lastPresentationTimeStamp = buffer.presentationTimeStamp
@@ -117,7 +122,12 @@ final class MediaLink {
         
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
         let bufferQueueDuration = bufferQueue.duration.seconds
-        delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
+        bufferInfoQueue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
+        }
         if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
