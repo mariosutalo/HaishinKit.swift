@@ -79,7 +79,7 @@ extension DisplayLinkChoreographer: Running {
                 Thread.sleep(forTimeInterval: self.dequeueBufferRateSeconds)
             }
         }
-        dequeBufferThread.qualityOfService = .userInteractive
+        dequeBufferThread.qualityOfService = .default
         dequeBufferThread.start()
     }
     

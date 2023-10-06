@@ -196,11 +196,11 @@ extension MediaLink: ChoreographerDelegate {
         guard let bufferQueue else {
             return
         }
-        if bufferSize < minimumBufferSizeForDequeue {
+        if self.bufferSize < minimumBufferSizeForDequeue {
             return
         }
-        if bufferSize > Constants.maxBufferSize {
-            while bufferSize > Constants.initialBufferSizeForDequeue {
+        if self.bufferSize > Constants.maxBufferSize {
+            while self.bufferSize > Constants.initialBufferSizeForDequeue {
                 CMBufferQueueDequeue(bufferQueue)
             }
         }
