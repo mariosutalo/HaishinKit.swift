@@ -30,6 +30,7 @@ final class RTMPNWSocket: RTMPSocketCompatible {
     }
     var qualityOfService: DispatchQoS = .userInitiated
     var inputBuffer = Data()
+    var inputRingBuffer = RingBuffer(count: 5000)
     weak var delegate: (any RTMPSocketDelegate)?
 
     private(set) var queueBytesOut: Atomic<Int64> = .init(0)
@@ -191,7 +192,8 @@ final class RTMPNWSocket: RTMPSocketCompatible {
             guard let self = self, let data = data, self.connected else {
                 return
             }
-            self.inputBuffer.append(data)
+            //self.inputBuffer.append(data)
+            self.inputRingBuffer.appendRange(data.bytes)
             self.totalBytesIn.mutate { $0 += Int64(data.count) }
             self.listen()
             self.receive(on: connection)
@@ -201,27 +203,50 @@ final class RTMPNWSocket: RTMPSocketCompatible {
     private func listen() {
         switch readyState {
         case .versionSent:
-            if inputBuffer.count < RTMPHandshake.sigSize + 1 {
+            /*if inputBuffer.count < RTMPHandshake.sigSize + 1 {
+                break
+            }*/
+            if inputRingBuffer.availableSpaceForReading < RTMPHandshake.sigSize + 1 {
                 break
             }
-            doOutput(data: handshake.c2packet(inputBuffer))
-            inputBuffer.removeSubrange(0...RTMPHandshake.sigSize)
+            //doOutput(data: handshake.c2packet(inputBuffer))
+            doOutput(data: handshake.c2packet(inputRingBuffer.getData()))
+            //inputBuffer.removeSubrange(0...RTMPHandshake.sigSize)
+            inputRingBuffer.clearToIndex(index: RTMPHandshake.sigSize)
             readyState = .ackSent
-            if RTMPHandshake.sigSize <= inputBuffer.count {
+            /*if RTMPHandshake.sigSize <= inputBuffer.count {
+                listen()
+            }*/
+            if RTMPHandshake.sigSize <= inputRingBuffer.availableSpaceForReading {
                 listen()
             }
         case .ackSent:
-            if inputBuffer.count < RTMPHandshake.sigSize {
+            /*if inputBuffer.count < RTMPHandshake.sigSize {
+                break
+            }*/
+            if inputRingBuffer.availableSpaceForReading < RTMPHandshake.sigSize {
                 break
             }
-            inputBuffer.removeAll()
+            //inputBuffer.removeAll()
+            inputRingBuffer.clear()
             readyState = .handshakeDone
         case .handshakeDone, .closing:
-            if inputBuffer.isEmpty {
+            /*if inputBuffer.isEmpty {
+                break
+            }*/
+            if inputRingBuffer.isEmpty {
                 break
             }
-            let bytes: Data = inputBuffer
-            inputBuffer.removeAll()
+            //print("input buff size: \(inputBuffer.count)")
+            //print("ring buffer size: \(ringBuffer.availableSpaceForReading)")
+            //let bytes: Data = inputBuffer
+            let bytes: Data = inputRingBuffer.getData()
+            //print("bytes 1: \(bytes.count)")
+            //print("bytes 2: \(bytes2.count)")
+            //print("input buff bytes: \(bytes.bytes)")
+            //print("input ring bytes: \(bytes2.bytes)")
+            //inputBuffer.removeAll()
+            inputRingBuffer.clear()
             delegate?.socket(self, data: bytes)
         default:
             break

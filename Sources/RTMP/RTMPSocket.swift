@@ -2,6 +2,8 @@ import Foundation
 
 // MARK: -
 final class RTMPSocket: NetSocket, RTMPSocketCompatible {
+    var inputRingBuffer: RingBuffer = RingBuffer(count: 1)
+    
     var readyState: RTMPSocketReadyState = .uninitialized {
         didSet {
             delegate?.socket(self, readyState: readyState)

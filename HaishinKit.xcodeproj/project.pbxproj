@@ -290,6 +290,9 @@
 		4C5A0D782AD00F7C000CF0AB /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4C948CC62AC465DF006D7505 /* Logboard.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; };
 		4C948CC72AC465DF006D7505 /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4CA77F6C2AD962A200741A1C /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA77F6B2AD962A200741A1C /* RingBuffer.swift */; };
+		4CA77F6D2AD962A200741A1C /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA77F6B2AD962A200741A1C /* RingBuffer.swift */; };
+		4CA77F6E2AD962A200741A1C /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA77F6B2AD962A200741A1C /* RingBuffer.swift */; };
 		4CCA4A6F2A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
 		4CCA4A702A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
 		4CCA4A712A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
@@ -766,6 +769,7 @@
 		2EC97B6E27880FF400D8BE32 /* OnTapGestureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnTapGestureView.swift; sourceTree = "<group>"; };
 		2EC97B6F27880FF400D8BE32 /* Views.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		2EC97B7027880FF400D8BE32 /* MTHKSwiftUiView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTHKSwiftUiView.swift; sourceTree = "<group>"; };
+		4CA77F6B2AD962A200741A1C /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HKPlayerView.swift; sourceTree = "<group>"; };
 		BC0BF4F429866FDE00D72CB4 /* IOMixerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOMixerTests.swift; sourceTree = "<group>"; };
 		BC0BF4F62986CE8700D72CB4 /* VideoCodecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCodecTests.swift; sourceTree = "<group>"; };
@@ -970,6 +974,7 @@
 				BC32E88729C9971100051507 /* InstanceHolder.swift */,
 				2942424C1CF4C01300D65DCB /* MD5.swift */,
 				2942A4F721A9418A004E1BEE /* Running.swift */,
+				4CA77F6B2AD962A200741A1C /* RingBuffer.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -2035,6 +2040,7 @@
 				2958911A1EEB8E3F00CE51E1 /* FLVAudioCodec.swift in Sources */,
 				BC4914B628DEC2FE009E2DF6 /* VTSessionMode.swift in Sources */,
 				295891261EEB8EF300CE51E1 /* FLVAACPacket.swift in Sources */,
+				4CA77F6C2AD962A200741A1C /* RingBuffer.swift in Sources */,
 				29B876791CD70ACE00FC07DA /* HTTPStream.swift in Sources */,
 				BC1DC50A2A039B4400E928ED /* HEVCDecoderConfigurationRecord.swift in Sources */,
 				BC6FC91E29609A6800A746EE /* ShapeFactory.swift in Sources */,
@@ -2121,6 +2127,7 @@
 				BC110254292DD6E900D48035 /* vImage_Buffer+Extension.swift in Sources */,
 				29EA87D61E799F6A0043A5F8 /* Mirror+Extension.swift in Sources */,
 				BC7A23F525171C8F0089F77C /* MTHKView.swift in Sources */,
+				4CA77F6D2AD962A200741A1C /* RingBuffer.swift in Sources */,
 				29B876F81CD70D5900FC07DA /* HTTPService.swift in Sources */,
 				29B876F91CD70D5900FC07DA /* HTTPStream.swift in Sources */,
 				296543631D62FE9000734698 /* HKView-macOS.swift in Sources */,
@@ -2290,6 +2297,7 @@
 				BC1DC5082A02963600E928ED /* FLVTagType.swift in Sources */,
 				29DF20642312A3DD004057C3 /* RTMPNWSocket.swift in Sources */,
 				29EB3E131ED05887001CAE8B /* SoundTransform.swift in Sources */,
+				4CA77F6E2AD962A200741A1C /* RingBuffer.swift in Sources */,
 				29EB3DF81ED05799001CAE8B /* Mirror+Extension.swift in Sources */,
 				BCA2252E293CC5B600DD7CB2 /* IOScreenCaptureUnit.swift in Sources */,
 				BC562DCD29576D220048D89A /* AVCaptureSession.Preset+Extension.swift in Sources */,

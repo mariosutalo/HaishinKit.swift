@@ -1,6 +1,8 @@
 import Foundation
 
 final class RTMPTSocket: NSObject, RTMPSocketCompatible {
+    var inputRingBuffer: RingBuffer = RingBuffer(count: 1)
+    
     static let defaultWindowSizeC = Int(UInt8.max)
     static let contentType: String = "application/x-fcs"
 
