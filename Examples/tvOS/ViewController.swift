@@ -12,8 +12,12 @@ final class ViewController: UIViewController {
     @IBOutlet private weak var lfView: MTHKView!
     @IBOutlet private weak var playbackOrPublishSegment: UISegmentedControl! {
         didSet {
-            guard AVContinuityDevicePickerViewController.isSupported else {
-                return
+            if #available(tvOS 17.0, *) {
+                guard AVContinuityDevicePickerViewController.isSupported else {
+                    return
+                }
+            } else {
+                // Fallback on earlier versions
             }
             playbackOrPublishSegment.removeSegment(at: 1, animated: false)
         }
@@ -51,9 +55,14 @@ final class ViewController: UIViewController {
     @IBAction func go(_ sender: UIButton) {
         switch mode {
         case .publish:
-            let picker = AVContinuityDevicePickerViewController()
-            picker.delegate = self
-            present(picker, animated: true)
+            if #available(tvOS 17.0, *) {
+                let picker = AVContinuityDevicePickerViewController()
+                picker.delegate = self
+                present(picker, animated: true)
+            } else {
+                // Fallback on earlier versions
+            }
+
         case .playback:
             connection.connect(Preference.defaultInstance.uri!)
         }
@@ -85,6 +94,7 @@ final class ViewController: UIViewController {
 
 extension ViewController: AVContinuityDevicePickerViewControllerDelegate {
     // MARK: AVContinuityDevicePickerViewControllerDelegate
+    @available(tvOS 17.0, *)
     func continuityDevicePicker( _ pickerViewController: AVContinuityDevicePickerViewController, didConnect device: AVContinuityDevice) {
         if let camera = device.videoDevices.first {
             logger.info(camera)
