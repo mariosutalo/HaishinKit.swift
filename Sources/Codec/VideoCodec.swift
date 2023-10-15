@@ -124,6 +124,7 @@ public class VideoCodec {
         if !sampleBuffer.isNotSync {
             needsSync.mutate { $0 = false }
         }
+
         _ = session?.decodeFrame(sampleBuffer) { [unowned self] status, _, imageBuffer, presentationTimeStamp, duration in
             guard let imageBuffer, status == noErr else {
                 self.delegate?.videoCodec(self, errorOccurred: .failedToFlame(status: status))
