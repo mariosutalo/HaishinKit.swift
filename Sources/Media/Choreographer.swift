@@ -66,34 +66,32 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
 
 extension DisplayLinkChoreographer: Running {
     
-    func startRunning() {
+    /*func startRunning() {
         if isRunning.value == true {
             return
         }
         isRunning.mutate { $0 = true }
         initializeAndStartPlaybackTimer(speed: 1.0)
         logger.info("Playback timer started")
-    }
+    }*/
         
-    /*func startRunning() {
+    func startRunning() {
         if isRunning.value == true {
             return
         }
         isRunning.mutate { $0 = true }
         dequeBufferThread = Thread() { [weak self] in
-
             while(self?.isRunning.value == true) {
                 guard let self = self else {
                     return
                 }
                 self.update()
-                Thread.sleep(forTimeInterval: self.dequeueBufferRateSeconds)
-                //Thread.sleep(forTimeInterval: 1/24)
+                Thread.sleep(forTimeInterval: dequeueBufferRateSeconds)
             }
         }
         dequeBufferThread.qualityOfService = .userInteractive
         dequeBufferThread.start()
-    }*/
+    }
     
     func stopRunning() {
         isRunning.mutate { $0 = false }
@@ -123,10 +121,17 @@ extension DisplayLinkChoreographer {
             }
             let currentTime = Date()
             let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
+            //let frameDurationSeconds = self.frameDurationSeconds
             if differenceInTime >= self.dequeueBufferRateSeconds {
+                //let timeOverflow = differenceInTime - frameDurationSeconds
                 self.update()
                 self.lastTriggered = currentTime
             }
+            /*if differenceInTime >= frameDurationSeconds {
+                let timeOverflow = differenceInTime - frameDurationSeconds
+                self.lastTriggered = currentTime - timeOverflow
+                self.update()
+            }*/
         }
         playbackTimer.resume()
     }
