@@ -59,12 +59,15 @@ public struct RingBuffer {
         writeIndex = 0
     }
     public mutating func getData() -> Data{
-        //print("array data is: \(array)")
         let pointer = UnsafeRawPointer(array)
         let newPointer = pointer.advanced(by: readIndex)
         //let buffer = Data(bytes: newPointer, count: writeIndex)
-        let buffer2 = Data(bytesNoCopy: UnsafeMutableRawPointer(mutating: newPointer), count: availableSpaceForReading, deallocator: .none)
-        return buffer2
+        let buffer = Data(bytesNoCopy: UnsafeMutableRawPointer(mutating: newPointer), count: availableSpaceForReading, deallocator: .none)
+        //let buffer3 = buffer2
+        //array[readIndex+1] = 122
+        //print("buffer 3 bytes: \(buffer3.bytes)")
+        //print("buffer bytes: \(buffer2.bytes)")
+        return buffer
     }
 }
 

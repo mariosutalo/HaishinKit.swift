@@ -522,9 +522,10 @@ extension RTMPConnection: RTMPSocketDelegate {
     }
 
     func socket(_ socket: any RTMPSocketCompatible, data: Data) {
+        var data = data
         guard let chunk = currentChunk ?? RTMPChunk(data, size: socket.chunkSizeC) else {
-            //socket.inputBuffer.append(data)
-            socket.inputRingBuffer.appendRange(data.bytes)
+            socket.inputBuffer.append(data)
+            //socket.inputRingBuffer.appendRange(data.bytes)
             return
         }
 
@@ -534,13 +535,13 @@ extension RTMPConnection: RTMPSocketDelegate {
         }
 
         if currentChunk != nil {
-            position = chunk.append(data, size: socket.chunkSizeC)
+            position = chunk.append(&data, size: socket.chunkSizeC)
         }
         if chunk.type == .two {
-            position = chunk.append(data, message: messages[chunk.streamId])
+            position = chunk.append(&data, message: messages[chunk.streamId])
         }
         if chunk.type == .three && fragmentedChunks[chunk.streamId] == nil {
-            position = chunk.append(data, message: messages[chunk.streamId])
+            position = chunk.append(&data, message: messages[chunk.streamId])
         }
 
         if let message = chunk.message, chunk.ready {

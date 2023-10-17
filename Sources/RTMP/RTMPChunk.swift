@@ -206,7 +206,7 @@ final class RTMPChunk {
         self.data = data
     }
 
-    func append(_ data: Data, size: Int) -> Int {
+    func append(_ data: inout Data, size: Int) -> Int {
         fragmented = false
 
         guard let message = message else {
@@ -233,7 +233,7 @@ final class RTMPChunk {
         return length
     }
 
-    func append(_ data: Data, message: RTMPMessage?) -> Int {
+    func append(_ data: inout Data, message: RTMPMessage?) -> Int {
         guard let message: RTMPMessage = message else {
             return 0
         }
