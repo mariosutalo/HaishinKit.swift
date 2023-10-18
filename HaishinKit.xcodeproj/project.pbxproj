@@ -287,7 +287,7 @@
 		2EC97B7327880FF400D8BE32 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC97B6F27880FF400D8BE32 /* Views.swift */; };
 		2EC97B7427880FF400D8BE32 /* MTHKSwiftUiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC97B7027880FF400D8BE32 /* MTHKSwiftUiView.swift */; };
 		4C5A0D772AD00F7C000CF0AB /* Logboard.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; };
-		4C5A0D782AD00F7C000CF0AB /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4C5A0D782AD00F7C000CF0AB /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4C948CC62AC465DF006D7505 /* Logboard.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; };
 		4C948CC72AC465DF006D7505 /* Logboard.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BC34DFD125EBB12C005F975A /* Logboard.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4CCA4A6F2A8A3A730080DEBE /* HKPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA4A6E2A8A3A730080DEBE /* HKPlayerView.swift */; };
@@ -845,7 +845,7 @@
 		BCD91C0C2A700FF50033F9E1 /* IOAudioMonitorRingBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOAudioMonitorRingBufferTests.swift; sourceTree = "<group>"; };
 		BCFB355324FA275600DC5108 /* PlaybackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackViewController.swift; sourceTree = "<group>"; };
 		BCFB355924FA40DD00DC5108 /* PlaybackContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackContainerViewController.swift; sourceTree = "<group>"; };
-		BCFF640A29C0C44B004EFF2F /* SampleVideo_360x240_5mb_2ch.ts */ = {isa = PBXFileReference; lastKnownFileType = file; path = SampleVideo_360x240_5mb_2ch.ts; sourceTree = "<group>"; };
+		BCFF640A29C0C44B004EFF2F /* SampleVideo_360x240_5mb_2ch.ts */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.typescript; path = SampleVideo_360x240_5mb_2ch.ts; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

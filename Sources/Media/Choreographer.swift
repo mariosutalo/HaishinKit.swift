@@ -89,7 +89,7 @@ extension DisplayLinkChoreographer: Running {
                 Thread.sleep(forTimeInterval: dequeueBufferRateSeconds)
             }
         }
-        dequeBufferThread.qualityOfService = .userInteractive
+        dequeBufferThread.qualityOfService = .userInitiated
         dequeBufferThread.start()
     }
     
@@ -121,11 +121,9 @@ extension DisplayLinkChoreographer {
             }
             let currentTime = Date()
             let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
-            //let frameDurationSeconds = self.frameDurationSeconds
             if differenceInTime >= self.dequeueBufferRateSeconds {
-                //let timeOverflow = differenceInTime - frameDurationSeconds
                 self.update()
-                self.lastTriggered = currentTime
+                self.lastTriggered = Date()
             }
             /*if differenceInTime >= frameDurationSeconds {
                 let timeOverflow = differenceInTime - frameDurationSeconds

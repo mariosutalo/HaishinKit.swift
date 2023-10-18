@@ -119,23 +119,26 @@ final class MediaLink {
         guard let bufferQueue = bufferQueue else {
             return
         }
-        
         CMBufferQueueEnqueue(bufferQueue, buffer: buffer)
-        let bufferQueueDuration = bufferQueue.duration.seconds
+        if self.bufferSize > Constants.maxBufferSize {
+            while self.bufferSize > Constants.initialBufferSizeForDequeue {
+                CMBufferQueueDequeue(bufferQueue)
+            }
+        }
         bufferInfoQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
-            delegate?.mediaLink(self, bufferSize: bufferQueueDuration)
+            delegate?.mediaLink(self, bufferSize: bufferSize)
         }
-        if !dequeueVideo && bufferQueueDuration >= Constants.initialBufferSizeForDequeue {
+        if !dequeueVideo && bufferSize >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
         if !dequeueVideo {
             return
         }
-        isVideoBuffering = bufferQueueDuration <= Constants.startBufferingBufferSize
-        if bufferQueueDuration > Constants.bufferSizeForDequeueAfterBuffering {
+        isVideoBuffering = bufferSize <= Constants.startBufferingBufferSize
+        if bufferSize > Constants.bufferSizeForDequeueAfterBuffering {
             minimumBufferSizeForDequeue = Constants.bufferSizeForDequeue
         }
     }
@@ -183,7 +186,7 @@ final class MediaLink {
     private func makeBufferkQueue() {
         CMBufferQueueCreate(
             allocator: kCFAllocatorDefault,
-            capacity: 1024,
+            capacity: 2048,
             callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
             queueOut: &bufferQueue
         )
@@ -199,17 +202,12 @@ extension MediaLink: ChoreographerDelegate {
         if self.bufferSize < minimumBufferSizeForDequeue {
             return
         }
-        if self.bufferSize > Constants.maxBufferSize {
-            while self.bufferSize > Constants.initialBufferSizeForDequeue {
-                CMBufferQueueDequeue(bufferQueue)
-            }
-        }
         guard let head = CMBufferQueueGetHead(bufferQueue) else {
             return
         }
         let first = head as! CMSampleBuffer
         CMBufferQueueDequeue(bufferQueue)
-        removeTimestampFromBuffer(first)
+        //removeTimestampFromBuffer(first)
         delegate?.mediaLink(self, dequeue: first)
     }
 }
@@ -238,11 +236,6 @@ extension MediaLink: Running {
                 return
             }
             self.choreographer.stopRunning()
-            do {
-                try self.bufferQueue?.reset()
-            } catch {
-                logger.error("Buffer queue reset error")
-            }
             self.bufferQueue = nil
             self.scheduledAudioBuffers.mutate { $0 = 0 }
             self.lastPresentationTimeStamp = .invalid
