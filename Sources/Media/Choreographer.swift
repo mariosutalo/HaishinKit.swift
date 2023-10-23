@@ -96,13 +96,13 @@ extension DisplayLinkChoreographer: Running {
     func stopRunning() {
         isRunning.mutate { $0 = false }
         
-        guard let timer = playbackTimer else {
+        /*guard let timer = playbackTimer else {
                     return
                 }
                 if !timer.isCancelled {
                     timer.cancel()
                     logger.info("Playback timer canceled")
-                }
+                }*/
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
