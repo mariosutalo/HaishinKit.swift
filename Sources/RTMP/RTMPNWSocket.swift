@@ -10,7 +10,8 @@ final class RTMPNWSocket: RTMPSocketCompatible {
     var timestamp: TimeInterval = 0.0
     var chunkSizeC: Int = RTMPChunk.defaultSize
     var chunkSizeS: Int = RTMPChunk.defaultSize
-    var windowSizeC = RTMPNWSocket.defaultWindowSizeC
+    //var windowSizeC = RTMPNWSocket.defaultWindowSizeC
+    var windowSizeC = 60000
     var timeout: Int = NetSocket.defaultTimeout
     var readyState: RTMPSocketReadyState = .uninitialized {
         didSet {
@@ -192,6 +193,7 @@ final class RTMPNWSocket: RTMPSocketCompatible {
             guard let self = self, let data = data, self.connected else {
                 return
             }
+            //print("data size: \(data.count)")
             self.inputBuffer.append(data)
             //self.inputRingBuffer.appendRange(data.bytes)
             self.totalBytesIn.mutate { $0 += Int64(data.count) }
