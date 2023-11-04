@@ -23,7 +23,9 @@ Carthage/*
 
 Package.resolved
 HaishinKit.xcodeproj/project.xcworkspace/xcuserdata/shogo.xcuserdatad/WorkspaceSettings.xcsettings
+HaishinKit.xcodeproj/project.xcworkspace/xcuserdata/mariosutalo.xcuserdatad/*
 *.xcsettings
 docs/undocumented.json
 fastlane/report.xml
 docs/docsets/HaishinKit.docset/Contents/Resources/Documents/undocumented.json
+HaishinKit.xcodeproj/project.xcworkspace/xcuserdata/mariosutalo.xcuserdatad/Bookmarks/bookmarks.plist
