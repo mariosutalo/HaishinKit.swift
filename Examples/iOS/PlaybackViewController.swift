@@ -60,7 +60,7 @@ final class PlaybackViewController: UIViewController {
         guard let data = e.data as? ASObject, let code = data["code"] as? String else {
             return
         }
-        logger.info(code)
+        logger.info("rtmp status handler: \(code)")
         switch code {
         case RTMPConnection.Code.connectSuccess.rawValue:
             retryCount = 0
