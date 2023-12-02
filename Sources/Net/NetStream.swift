@@ -327,6 +327,7 @@ open class NetStream: NSObject {
 }
 
 extension NetStream: IOMixerDelegate {
+    
     // MARK: IOMixerDelegate
     func mixer(_ mixer: IOMixer, didOutput video: CMSampleBuffer) {
         delegate?.stream(self, didOutput: video)

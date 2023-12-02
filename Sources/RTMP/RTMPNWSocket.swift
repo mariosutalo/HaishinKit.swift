@@ -11,7 +11,7 @@ final class RTMPNWSocket: RTMPSocketCompatible {
     var chunkSizeC: Int = RTMPChunk.defaultSize
     var chunkSizeS: Int = RTMPChunk.defaultSize
     //var windowSizeC = RTMPNWSocket.defaultWindowSizeC
-    var windowSizeC = 60000
+    var windowSizeC = 5120
     var timeout: Int = NetSocket.defaultTimeout
     var readyState: RTMPSocketReadyState = .uninitialized {
         didSet {

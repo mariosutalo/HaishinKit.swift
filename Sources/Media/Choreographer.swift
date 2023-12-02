@@ -23,10 +23,10 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
     private static let duration = 0.0
     private static let preferredFramesPerSecond = 0
     // added code
-    let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInitiated)
-    var playbackTimer: DispatchSourceTimer!
-    var dequeBufferThread: Thread!
-    var frameDurationSeconds: Double = 0.041 // same as 24 fps - initial framerate
+    let dequeuBufferQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.dequeueBufferQueue", qos: .userInteractive)
+    var playbackTimer: DispatchSourceTimer?
+    var dequeBufferThread: Thread?
+    var frameDurationSeconds: Double = 0.0416 // same as 24 fps - initial framerate
     var dequeueBufferRateSeconds: Double = 1 / 24
     let timerIntervalSeconds: Double = 1 / 500
     var lastTriggered = Date()
@@ -66,43 +66,42 @@ final class DisplayLinkChoreographer: NSObject, Choreographer {
 
 extension DisplayLinkChoreographer: Running {
     
-    /*func startRunning() {
+    func startRunning() {
         if isRunning.value == true {
             return
         }
         isRunning.mutate { $0 = true }
         initializeAndStartPlaybackTimer(speed: 1.0)
         logger.info("Playback timer started")
-    }*/
-        
-    func startRunning() {
-        if isRunning.value == true {
-            return
-        }
-        isRunning.mutate { $0 = true }
-        dequeBufferThread = Thread() { [weak self] in
-            while(self?.isRunning.value == true) {
-                guard let self = self else {
-                    return
-                }
-                self.update()
-                Thread.sleep(forTimeInterval: dequeueBufferRateSeconds)
-            }
-        }
-        dequeBufferThread.qualityOfService = .userInitiated
-        dequeBufferThread.start()
     }
+        
+//    func startRunning() {
+//        if isRunning.value == true {
+//            return
+//        }
+//        isRunning.mutate { $0 = true }
+//        dequeBufferThread = Thread() { [weak self] in
+//            while(self?.isRunning.value == true) {
+//                guard let self = self else {
+//                    return
+//                }
+//                self.update()
+//                Thread.sleep(forTimeInterval: dequeueBufferRateSeconds)
+//            }
+//        }
+//        dequeBufferThread.qualityOfService = .userInitiated
+//        dequeBufferThread.start()
+//    }
     
     func stopRunning() {
         isRunning.mutate { $0 = false }
-        
-        /*guard let timer = playbackTimer else {
+        guard let timer = playbackTimer else {
                     return
                 }
                 if !timer.isCancelled {
                     timer.cancel()
                     logger.info("Playback timer canceled")
-                }*/
+                }
     }
     
     func setPlaybackSpeed(speed playbackSpeed: Double) {
@@ -114,8 +113,8 @@ extension DisplayLinkChoreographer {
 
     func initializeAndStartPlaybackTimer(speed playbackSpeed: Double){
         playbackTimer = DispatchSource.makeTimerSource(flags: .strict, queue: dequeuBufferQueue)
-        playbackTimer.schedule(deadline: .now(), repeating: timerIntervalSeconds)
-        playbackTimer.setEventHandler() { [weak self] in
+        playbackTimer?.schedule(deadline: .now(), repeating: timerIntervalSeconds, leeway: .nanoseconds(100))
+        playbackTimer?.setEventHandler() { [weak self] in
             guard let self = self else {
                 return
             }
@@ -123,7 +122,7 @@ extension DisplayLinkChoreographer {
             let differenceInTime = currentTime.timeIntervalSince(self.lastTriggered)
             if differenceInTime >= self.dequeueBufferRateSeconds {
                 self.update()
-                self.lastTriggered = Date()
+                self.lastTriggered = currentTime
             }
             /*if differenceInTime >= frameDurationSeconds {
                 let timeOverflow = differenceInTime - frameDurationSeconds
@@ -131,7 +130,7 @@ extension DisplayLinkChoreographer {
                 self.update()
             }*/
         }
-        playbackTimer.resume()
+        playbackTimer?.resume()
     }
 }
 

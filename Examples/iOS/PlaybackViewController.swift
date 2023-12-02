@@ -90,7 +90,6 @@ final class PlaybackViewController: UIViewController {
         guard let data = e.data as? ASObject, let code = data["code"] as? String else {
             return
         }
-        //logger.info(code)
         switch code {
         case RTMPConnection.Code.connectSuccess.rawValue:
             retryCount = 0
@@ -130,6 +129,7 @@ final class PlaybackViewController: UIViewController {
 }
 
 extension PlaybackViewController: NetStreamDelegate {
+    
     func stream(_ stream: HaishinKit.NetStream, isVideoBuffering: Bool) {
     }
     

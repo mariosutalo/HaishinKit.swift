@@ -48,6 +48,229 @@
 			<key>type</key>
 			<string>bookmark</string>
 		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>12</string>
+					<key>EndingLineNumber</key>
+					<string>179</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>179</string>
+					<key>Timestamp</key>
+					<string>721306285.522841</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Sources/RTMP/RTMPNWSocket.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>            </string>
+				<key>leading</key>
+				<string>            logger.debug("Connection is preparing.")
+        case .failed(let error):
+</string>
+				<key>trailing</key>
+				<string>logger.warn("Connection failed:", error)
+            close(isDisconnected: true)
+        case .cancelled:
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>14</string>
+					<key>EndingLineNumber</key>
+					<string>62</string>
+					<key>StartingColumnNumber</key>
+					<string>8</string>
+					<key>StartingLineNumber</key>
+					<string>62</string>
+					<key>Timestamp</key>
+					<string>721307107.19609</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Examples/iOS/PlaybackViewController.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string></string>
+				<key>leading</key>
+				<string>            running = false
+        }
+    }</string>
+				<key>trailing</key>
+				<string>
+    
+    private func connectToStream() {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>128</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>127</string>
+					<key>Timestamp</key>
+					<string>721645677.54198</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Sources/Codec/VideoCodec.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>        //return()
+</string>
+				<key>leading</key>
+				<string>        }
+        //delegate?.videoCodec(self, didOutput: sampleBuffer)
+</string>
+				<key>trailing</key>
+				<string>        _ = session?.decodeFrame(sampleBuffer) { [unowned self] status, _, imageBuffer, presentationTimeStamp, duration in
+            guard let imageBuffer, status == noErr else {
+                self.delegate?.videoCodec(self, errorOccurred: .failedToFlame(status: status))
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>115</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>114</string>
+					<key>Timestamp</key>
+					<string>722342972.8499939</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Sources/Media/MediaLink.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>            choreographer.frameDurationSeconds = difference
+</string>
+				<key>leading</key>
+				<string>                delegate?.mediaLink(self, frameRate: 1 / difference)
+            }
+</string>
+				<key>trailing</key>
+				<string>        }
+        lastPresentationTimeStamp = buffer.presentationTimeStamp
+
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>106</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>105</string>
+					<key>Timestamp</key>
+					<string>722342972.850009</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Sources/Media/MediaLink.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>            choreographer.frameDurationSeconds = buffer.presentationTimeStamp.seconds
+</string>
+				<key>leading</key>
+				<string>        }
+        if lastPresentationTimeStamp == .invalid {
+</string>
+				<key>trailing</key>
+				<string>        } else {
+            let difference = buffer.presentationTimeStamp.seconds - lastPresentationTimeStamp.seconds
+            bufferInfoQueue.async { [weak self] in
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
 	</array>
 </dict>
 </plist>

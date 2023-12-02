@@ -22,7 +22,7 @@ final class MediaLink {
         // minimum buffer size for dequeue after player is buffering, doesnt start dequeing until this values
         static let bufferSizeForDequeueAfterBuffering = 0.6
         // send isBuffering signal to delegate when buffer is this value or lower
-        static let startBufferingBufferSize = 0.2
+        static let minimumBufferSizeForBuffering = 0.1
         // maximum buffer size, when this size is exceeded, buffer is dequeued to initial buffer size
         static let maxBufferSize = 3.0
     }
@@ -125,19 +125,12 @@ final class MediaLink {
                 CMBufferQueueDequeue(bufferQueue)
             }
         }
-        bufferInfoQueue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-            delegate?.mediaLink(self, bufferSize: bufferSize)
-        }
         if !dequeueVideo && bufferSize >= Constants.initialBufferSizeForDequeue {
             dequeueVideo = true
         }
         if !dequeueVideo {
             return
         }
-        isVideoBuffering = bufferSize <= Constants.startBufferingBufferSize
         if bufferSize > Constants.bufferSizeForDequeueAfterBuffering {
             minimumBufferSizeForDequeue = Constants.bufferSizeForDequeue
         }
@@ -186,7 +179,7 @@ final class MediaLink {
     private func makeBufferkQueue() {
         CMBufferQueueCreate(
             allocator: kCFAllocatorDefault,
-            capacity: 2048,
+            capacity: 1024,
             callbacks: CMBufferQueueGetCallbacksForSampleBuffersSortedByOutputPTS(),
             queueOut: &bufferQueue
         )
@@ -199,6 +192,20 @@ extension MediaLink: ChoreographerDelegate {
         guard let bufferQueue else {
             return
         }
+        
+        bufferInfoQueue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            delegate?.mediaLink(self, bufferSize: bufferSize)
+        }
+        
+        if !dequeueVideo {
+            return
+        }
+        
+        isVideoBuffering = bufferSize <= Constants.minimumBufferSizeForBuffering
+        
         if self.bufferSize < minimumBufferSizeForDequeue {
             return
         }
